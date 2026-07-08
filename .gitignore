@@ -1,0 +1,12 @@
+node_modules/
+.env
+uploads/photos/*
+uploads/documents/*
+uploads/complaints/*
+!uploads/photos/.gitkeep
+!uploads/documents/.gitkeep
+!uploads/complaints/.gitkeep
+frontend/dist/
+*.log
+.DS_Store
+Thumbs.db
