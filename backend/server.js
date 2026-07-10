@@ -50,7 +50,7 @@ app.use('/api/audit', require('./routes/audit'));
 
 const frontendDist = path.join(__dirname, '../frontend/dist');
 app.use(express.static(frontendDist));
-app.get('*', (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(frontendDist, 'index.html'));
 });
 
