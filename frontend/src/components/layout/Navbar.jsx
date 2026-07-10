@@ -123,11 +123,19 @@ export default function Navbar() {
                       className="flex items-center gap-3 p-2 hover:bg-base-200 rounded-lg w-full text-left"
                       onClick={() => { navigate(`/students/${student._id}`); setShowSearch(false) }}
                     >
-                      <div className="avatar placeholder">
-                        <div className="bg-primary text-primary-content rounded-full w-8 h-8 text-xs">
-                          {student.user?.name?.charAt(0) || 'S'}
+                      {student.user?.photo ? (
+                        <div className="avatar">
+                          <div className="w-8 rounded-full">
+                            <img src={student.user.photo} alt="" />
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="avatar placeholder">
+                          <div className="bg-primary text-primary-content rounded-full w-8 h-8 text-xs">
+                            <span>{student.user?.name?.charAt(0) || 'S'}</span>
+                          </div>
+                        </div>
+                      )}
                       <div>
                         <p className="text-sm font-medium">{student.user?.name}</p>
                         <p className="text-xs text-base-content/60">{student.studentId} — {student.room?.roomNumber || 'No room'}</p>
@@ -183,11 +191,19 @@ export default function Navbar() {
 
         <div className="dropdown dropdown-end">
           <button className="btn btn-ghost btn-sm btn-circle">
-            <div className="avatar placeholder">
-              <div className="bg-neutral text-neutral-content rounded-full w-7 h-7 text-xs">
-                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+            {user?.photo ? (
+              <div className="avatar">
+                <div className="w-7 rounded-full">
+                  <img src={user.photo} alt="" />
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="avatar placeholder">
+                <div className="bg-neutral text-neutral-content rounded-full w-7 h-7 text-xs">
+                  <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+                </div>
+              </div>
+            )}
           </button>
           <div className="dropdown-content card card-compact bg-base-100 shadow-xl border border-base-300 w-48 mt-2">
             <div className="card-body p-2">

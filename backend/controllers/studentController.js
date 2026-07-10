@@ -55,7 +55,7 @@ exports.createStudent = async (req, res, next) => {
 
 exports.updateStudent = async (req, res, next) => {
   try {
-    const student = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+    const student = await Student.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after', runValidators: true })
       .populate('user', 'name email phone photo');
     if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
     if (req.body.name) {

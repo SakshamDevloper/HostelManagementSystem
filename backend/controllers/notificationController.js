@@ -11,7 +11,7 @@ exports.getNotifications = async (req, res, next) => {
 
 exports.markAsRead = async (req, res, next) => {
   try {
-    const notification = await Notification.findByIdAndUpdate(req.params.id, { isRead: true }, { new: true });
+    const notification = await Notification.findByIdAndUpdate(req.params.id, { isRead: true }, { returnDocument: 'after' });
     if (!notification) return res.status(404).json({ success: false, message: 'Notification not found' });
     res.json({ success: true, data: notification });
   } catch (error) {

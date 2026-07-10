@@ -4,10 +4,12 @@ import toast from 'react-hot-toast'
 import Modal from '../components/common/Modal'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import EmptyState from '../components/common/EmptyState'
+import { useAuth } from '../context/AuthContext'
 import { getPayments, createPayment, getDues } from '../services/paymentService'
 import { getStudents } from '../services/studentService'
 
 export default function PaymentsPage() {
+  const { user } = useAuth()
   const [payments, setPayments] = useState([])
   const [dues, setDues] = useState([])
   const [loading, setLoading] = useState(true)
@@ -18,6 +20,7 @@ export default function PaymentsPage() {
   const [filterYear, setFilterYear] = useState(new Date().getFullYear().toString())
   const [filterStatus, setFilterStatus] = useState('')
   const [form, setForm] = useState({ student: '', amount: '', month: new Date().getMonth() + 1, year: new Date().getFullYear(), type: 'rent', paymentMethod: 'cash', notes: '' })
+  const canRecord = user?.role === 'admin' || user?.role === 'staff'
 
   const fetchPayments = async () => {
     try {
@@ -88,7 +91,7 @@ export default function PaymentsPage() {
             <DollarSign size={16} /> Dues
             {dues.length > 0 && <span className="badge badge-error badge-xs ml-1">{dues.length}</span>}
           </button>
-          <button onClick={openAddPayment} className="btn btn-primary btn-sm"><Plus size={16} /> Record Payment</button>
+          {canRecord && <button onClick={openAddPayment} className="btn btn-primary btn-sm"><Plus size={16} /> Record Payment</button>}
         </div>
       </div>
 
@@ -135,7 +138,7 @@ export default function PaymentsPage() {
       )}
 
       {payments.length === 0 ? (
-        <EmptyState title="No payments" action={<button onClick={openAddPayment} className="btn btn-primary btn-sm"><Plus size={16} /> Record Payment</button>} />
+        <EmptyState title="No payments" action={canRecord ? <button onClick={openAddPayment} className="btn btn-primary btn-sm"><Plus size={16} /> Record Payment</button> : undefined} />
       ) : (
         <div className="overflow-x-auto">
           <table className="table table-sm table-zebra">

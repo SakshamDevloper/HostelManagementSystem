@@ -26,7 +26,10 @@ const setupSocket = (server) => {
 };
 
 const getIO = () => {
-  if (!io) throw new Error('Socket.io not initialized');
+  if (!io) {
+    console.warn('Socket.io not initialized - returning noop');
+    return null;
+  }
   return io;
 };
 

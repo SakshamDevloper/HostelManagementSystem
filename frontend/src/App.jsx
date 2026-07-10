@@ -3,9 +3,11 @@ import { useAuth } from './context/AuthContext'
 import Layout from './components/layout/Layout'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
+import AttendancePage from './pages/AttendancePage'
 import StudentsPage from './pages/StudentsPage'
 import StudentDetailPage from './pages/StudentDetailPage'
 import RoomsPage from './pages/RoomsPage'
+import RoomTransfersPage from './pages/RoomTransfersPage'
 import PaymentsPage from './pages/PaymentsPage'
 import ComplaintsPage from './pages/ComplaintsPage'
 import LeavesPage from './pages/LeavesPage'
@@ -39,7 +41,9 @@ function App() {
         <Route path="students" element={<StudentsPage />} />
         <Route path="students/:id" element={<StudentDetailPage />} />
         <Route path="rooms" element={<RoomsPage />} />
+        <Route path="transfers" element={<RoomTransfersPage />} />
         <Route path="payments" element={<PaymentsPage />} />
+        <Route path="attendance" element={<AttendancePage />} />
         <Route path="complaints" element={<ComplaintsPage />} />
         <Route path="leaves" element={<LeavesPage />} />
         <Route path="visitors" element={<VisitorsPage />} />

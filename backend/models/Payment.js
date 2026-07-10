@@ -18,9 +18,8 @@ const paymentSchema = new mongoose.Schema({
   recordedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, { timestamps: true });
 
-paymentSchema.pre('save', function (next) {
+paymentSchema.pre('save', function () {
   this.totalAmount = (this.amount || 0) + (this.lateFee || 0);
-  next();
 });
 
 module.exports = mongoose.model('Payment', paymentSchema);

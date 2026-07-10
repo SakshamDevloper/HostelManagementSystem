@@ -12,6 +12,10 @@ exports.getPayments = async (req, res, next) => {
     if (month) query.month = parseInt(month);
     if (year) query.year = parseInt(year);
     if (status) query.status = status;
+    if (req.user.role === 'student') {
+      const student = await Student.findOne({ user: req.user._id });
+      if (student) query.student = student._id;
+    }
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const payments = await Payment.find(query)
       .populate({ path: 'student', populate: { path: 'user', select: 'name email' } })
@@ -70,7 +74,7 @@ exports.createPayment = async (req, res, next) => {
 
 exports.updatePayment = async (req, res, next) => {
   try {
-    const payment = await Payment.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const payment = await Payment.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after', runValidators: true });
     if (!payment) return res.status(404).json({ success: false, message: 'Payment not found' });
     res.json({ success: true, data: payment });
   } catch (error) {
@@ -83,13 +87,19 @@ exports.getDues = async (req, res, next) => {
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth() + 1;
     const currentYear = currentDate.getFullYear();
-    const dues = await Payment.find({
+    const query = {
       status: { $in: ['pending', 'overdue'] },
       $or: [
         { year: { $lt: currentYear } },
         { year: currentYear, month: { $lte: currentMonth } },
       ],
-    }).populate({ path: 'student', populate: { path: 'user', select: 'name email phone' } }).sort({ createdAt: -1 });
+    };
+    if (req.user.role === 'student') {
+      const student = await Student.findOne({ user: req.user._id });
+      if (student) query.student = student._id;
+    }
+    const dues = await Payment.find(query)
+      .populate({ path: 'student', populate: { path: 'user', select: 'name email phone' } }).sort({ createdAt: -1 });
     res.json({ success: true, data: dues });
   } catch (error) {
     next(error);

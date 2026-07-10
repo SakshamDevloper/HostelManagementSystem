@@ -43,7 +43,7 @@ exports.createVisitor = async (req, res, next) => {
 
 exports.checkoutVisitor = async (req, res, next) => {
   try {
-    const visitor = await VisitorLog.findByIdAndUpdate(req.params.id, { outTime: new Date() }, { new: true });
+    const visitor = await VisitorLog.findByIdAndUpdate(req.params.id, { outTime: new Date() }, { returnDocument: 'after' });
     if (!visitor) return res.status(404).json({ success: false, message: 'Visitor not found' });
     res.json({ success: true, data: visitor });
   } catch (error) {

@@ -12,7 +12,7 @@ const createNotification = async ({ user, type, title, message, link }) => {
     });
 
     const io = getIO();
-    io.to(`user:${user}`).emit('notification:new', notification);
+    if (io) io.to(`user:${user}`).emit('notification:new', notification);
 
     return notification;
   } catch (error) {

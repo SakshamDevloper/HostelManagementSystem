@@ -21,7 +21,7 @@ exports.createNotice = async (req, res, next) => {
     await logActivity({ user: req.user._id, action: 'create', resource: 'notice', resourceId: notice._id, details: { title: notice.title }, ip: req.ip });
     if (notice.priority === 'urgent') {
       const io = getIO();
-      io.emit('announcement:urgent', { notice });
+      if (io) io.emit('announcement:urgent', { notice });
     }
     const populated = await Notice.findById(notice._id).populate('postedBy', 'name');
     res.status(201).json({ success: true, data: populated });
@@ -32,7 +32,7 @@ exports.createNotice = async (req, res, next) => {
 
 exports.updateNotice = async (req, res, next) => {
   try {
-    const notice = await Notice.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('postedBy', 'name');
+    const notice = await Notice.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' }).populate('postedBy', 'name');
     if (!notice) return res.status(404).json({ success: false, message: 'Notice not found' });
     res.json({ success: true, data: notice });
   } catch (error) {

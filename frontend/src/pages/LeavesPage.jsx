@@ -4,16 +4,20 @@ import toast from 'react-hot-toast'
 import Modal from '../components/common/Modal'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import EmptyState from '../components/common/EmptyState'
+import { useAuth } from '../context/AuthContext'
 import { getLeaves, createLeave, updateLeaveStatus } from '../services/leaveService'
 
 const statusColors = { pending: 'badge-warning', approved: 'badge-success', rejected: 'badge-error', expired: 'badge-ghost' }
 
 export default function LeavesPage() {
+  const { user } = useAuth()
   const [leaves, setLeaves] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [filterStatus, setFilterStatus] = useState('')
   const [form, setForm] = useState({ fromDate: '', toDate: '', reason: '', destination: '', guardianContact: '' })
+
+  const canManage = user?.role === 'admin' || user?.role === 'staff'
 
   const fetchLeaves = async () => {
     try {
@@ -82,7 +86,7 @@ export default function LeavesPage() {
                   <div className="col-span-2"><span className="text-xs text-base-content/60">Reason:</span> {l.reason}</div>
                   <div className="col-span-2"><span className="text-xs text-base-content/60">Student:</span> {l.student?.user?.name}</div>
                 </div>
-                {l.status === 'pending' && (
+                {l.status === 'pending' && canManage && (
                   <div className="flex gap-1 mt-3 pt-2 border-t border-base-200">
                     <button onClick={() => handleStatus(l._id, 'approved')} className="btn btn-ghost btn-xs text-success">Approve</button>
                     <button onClick={() => handleStatus(l._id, 'rejected')} className="btn btn-ghost btn-xs text-error">Reject</button>

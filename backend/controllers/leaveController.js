@@ -38,7 +38,7 @@ exports.createLeave = async (req, res, next) => {
 exports.updateLeaveStatus = async (req, res, next) => {
   try {
     const { status, remarks } = req.body;
-    const leave = await LeaveRequest.findByIdAndUpdate(req.params.id, { status, approvedBy: req.user._id, remarks }, { new: true })
+    const leave = await LeaveRequest.findByIdAndUpdate(req.params.id, { status, approvedBy: req.user._id, remarks }, { returnDocument: 'after' })
       .populate({ path: 'student', populate: { path: 'user', select: 'name email _id' } });
     if (!leave) return res.status(404).json({ success: false, message: 'Leave request not found' });
     if (leave.student?.user?._id) {

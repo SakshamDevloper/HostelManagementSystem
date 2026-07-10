@@ -11,6 +11,22 @@ export default function ProfilePage() {
   const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
   const [showPassword, setShowPassword] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('photo', file)
+      const { data } = await api.post('/api/uploads/image', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+      await api.put('/api/auth/profile', { photo: data.data?.url || data.url })
+      toast.success('Photo updated')
+      loadUser()
+    } catch (err) { toast.error(err.response?.data?.message || 'Upload failed') }
+    finally { setUploading(false) }
+  }
 
   const handleSaveProfile = async (e) => {
     e.preventDefault()
@@ -52,14 +68,29 @@ export default function ProfilePage() {
       <div className="card bg-base-100 border border-base-300 shadow-sm">
         <div className="card-body p-6">
           <div className="flex items-center gap-4 mb-6">
-            <div className="avatar placeholder">
-              <div className="bg-primary text-primary-content rounded-full w-16 h-16 text-2xl">
-                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-              </div>
+            <div className="relative">
+              {user?.photo ? (
+                <div className="avatar">
+                  <div className="w-20 rounded-full">
+                    <img src={user.photo} alt="Profile" />
+                  </div>
+                </div>
+              ) : (
+                <div className="avatar placeholder">
+                  <div className="bg-primary text-primary-content rounded-full w-20 h-20 text-3xl">
+                    <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+                  </div>
+                </div>
+              )}
+              <label className="absolute -bottom-1 -right-1 btn btn-circle btn-xs btn-primary">
+                <Camera size={12} />
+                <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} disabled={uploading} />
+              </label>
             </div>
             <div>
               <h2 className="text-xl font-bold">{user?.name}</h2>
               <p className="text-sm text-base-content/60 capitalize">{user?.role}</p>
+              <p className="text-xs text-base-content/40 mt-1">{user?.email}</p>
             </div>
           </div>
 

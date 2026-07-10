@@ -1,2 +1,108 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out;
+}
+
+.card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.card:nth-child(2) { animation-delay: 0.05s; }
+.card:nth-child(3) { animation-delay: 0.1s; }
+.card:nth-child(4) { animation-delay: 0.15s; }
+.card:nth-child(5) { animation-delay: 0.2s; }
+.card:nth-child(6) { animation-delay: 0.25s; }
+
+.table tr {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-box {
+  animation: scaleIn 0.2s ease-out !important;
+}
+
+.dropdown-content {
+  animation: scaleIn 0.15s ease-out !important;
+}
+
+.btn {
+  transition: all 0.15s ease;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.badge {
+  transition: all 0.2s ease;
+}
+
+.progress-bar {
+  transition: width 0.5s ease;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(var(--bc) / 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(var(--bc) / 0.4);
+}
+
+.skeleton-loading {
+  background: linear-gradient(
+    90deg,
+    oklch(var(--b2)) 25%,
+    oklch(var(--b3)) 50%,
+    oklch(var(--b2)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

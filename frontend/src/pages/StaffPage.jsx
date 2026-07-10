@@ -106,11 +106,19 @@ export default function StaffPage() {
               <div className="card-body p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="avatar placeholder">
-                      <div className="bg-secondary text-secondary-content rounded-full w-10 h-10 text-sm">
-                        {s.user?.name?.charAt(0) || 'S'}
+                    {s.user?.photo ? (
+                      <div className="avatar">
+                        <div className="w-10 rounded-full">
+                          <img src={s.user.photo} alt="" />
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="avatar placeholder">
+                        <div className="bg-secondary text-secondary-content rounded-full w-10 h-10 text-sm">
+                          <span>{s.user?.name?.charAt(0) || 'S'}</span>
+                        </div>
+                      </div>
+                    )}
                     <div>
                       <h3 className="font-semibold text-sm">{s.user?.name}</h3>
                       <p className="text-xs text-base-content/60">{s.staffId}</p>

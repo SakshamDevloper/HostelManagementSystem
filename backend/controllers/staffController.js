@@ -30,7 +30,7 @@ exports.createStaff = async (req, res, next) => {
 
 exports.updateStaff = async (req, res, next) => {
   try {
-    const staff = await Staff.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('user', 'name email phone photo');
+    const staff = await Staff.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' }).populate('user', 'name email phone photo');
     if (!staff) return res.status(404).json({ success: false, message: 'Staff not found' });
     if (req.body.name) {
       await User.findByIdAndUpdate(staff.user._id, { name: req.body.name });

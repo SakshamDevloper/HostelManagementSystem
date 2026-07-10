@@ -31,8 +31,12 @@ exports.getMe = async (req, res) => {
 
 exports.updateProfile = async (req, res, next) => {
   try {
-    const { name, phone } = req.body;
-    const user = await User.findByIdAndUpdate(req.user._id, { name, phone }, { new: true });
+    const { name, phone, photo } = req.body;
+    const update = {};
+    if (name !== undefined) update.name = name;
+    if (phone !== undefined) update.phone = phone;
+    if (photo !== undefined) update.photo = photo;
+    const user = await User.findByIdAndUpdate(req.user._id, update, { returnDocument: 'after' });
     res.json({ success: true, user });
   } catch (error) {
     next(error);

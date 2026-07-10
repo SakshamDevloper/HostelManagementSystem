@@ -41,7 +41,7 @@ exports.createRoom = async (req, res, next) => {
 
 exports.updateRoom = async (req, res, next) => {
   try {
-    const room = await Room.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const room = await Room.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after', runValidators: true });
     if (!room) return res.status(404).json({ success: false, message: 'Room not found' });
     res.json({ success: true, data: room });
   } catch (error) {
@@ -116,7 +116,7 @@ exports.vacateRoom = async (req, res, next) => {
 exports.updateInventory = async (req, res, next) => {
   try {
     const { inventory } = req.body;
-    const room = await Room.findByIdAndUpdate(req.params.id, { inventory }, { new: true });
+    const room = await Room.findByIdAndUpdate(req.params.id, { inventory }, { returnDocument: 'after' });
     if (!room) return res.status(404).json({ success: false, message: 'Room not found' });
     res.json({ success: true, data: room });
   } catch (error) {

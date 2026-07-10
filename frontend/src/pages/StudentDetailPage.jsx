@@ -54,11 +54,19 @@ export default function StudentDetailPage() {
         <div className="card-body p-6">
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
-              <div className="avatar placeholder">
-                <div className="bg-primary text-primary-content rounded-full w-16 h-16 text-xl">
-                  {student.user?.name?.charAt(0) || 'S'}
+              {student.user?.photo ? (
+                <div className="avatar">
+                  <div className="w-16 rounded-full">
+                    <img src={student.user.photo} alt="" />
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="avatar placeholder">
+                  <div className="bg-primary text-primary-content rounded-full w-16 h-16 text-xl">
+                    <span>{student.user?.name?.charAt(0) || 'S'}</span>
+                  </div>
+                </div>
+              )}
               <div>
                 <h2 className="text-xl font-bold">{student.user?.name}</h2>
                 <p className="text-sm text-base-content/60">{student.studentId}</p>

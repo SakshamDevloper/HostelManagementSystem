@@ -41,13 +41,15 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="form-control">
               <label className="label py-1"><span className="label-text text-sm">Email</span></label>
-              <input
-                type="email"
-                placeholder="admin@hostel.com"
-                className="input input-bordered input-sm"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-              />
+              <div>
+                <input
+                  type="email"
+                  placeholder="admin@hostel.com"
+                  className="input input-bordered input-sm w-full"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                />
+              </div>
             </div>
 
             <div className="form-control">

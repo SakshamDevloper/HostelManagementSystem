@@ -38,7 +38,7 @@ exports.createComplaint = async (req, res, next) => {
     const complaint = await Complaint.create(data);
     await logActivity({ user: req.user._id, action: 'create', resource: 'complaint', resourceId: complaint._id, details: { category: complaint.category }, ip: req.ip });
     const io = getIO();
-    io.emit('complaint:new', { complaint: { _id: complaint._id, category: complaint.category, status: complaint.status, createdAt: complaint.createdAt } });
+    if (io) io.emit('complaint:new', { complaint: { _id: complaint._id, category: complaint.category, status: complaint.status, createdAt: complaint.createdAt } });
     const populated = await Complaint.findById(complaint._id)
       .populate({ path: 'student', populate: { path: 'user', select: 'name' } });
     res.status(201).json({ success: true, data: populated });
@@ -55,12 +55,12 @@ exports.updateComplaintStatus = async (req, res, next) => {
       update.resolvedAt = new Date();
       update.resolvedBy = resolvedBy || req.user._id;
     }
-    const complaint = await Complaint.findByIdAndUpdate(req.params.id, update, { new: true })
+    const complaint = await Complaint.findByIdAndUpdate(req.params.id, update, { returnDocument: 'after' })
       .populate({ path: 'student', populate: { path: 'user', select: 'name email' } });
     if (!complaint) return res.status(404).json({ success: false, message: 'Complaint not found' });
     await logActivity({ user: req.user._id, action: 'updateStatus', resource: 'complaint', resourceId: complaint._id, details: { status }, ip: req.ip });
     const io = getIO();
-    io.emit('complaint:statusChange', { complaintId: complaint._id, status });
+    if (io) io.emit('complaint:statusChange', { complaintId: complaint._id, status });
     if (complaint.student?.user?._id) {
       await createNotification({
         user: complaint.student.user._id,
@@ -79,7 +79,7 @@ exports.updateComplaintStatus = async (req, res, next) => {
 exports.addFeedback = async (req, res, next) => {
   try {
     const { feedback, feedbackRating } = req.body;
-    const complaint = await Complaint.findByIdAndUpdate(req.params.id, { feedback, feedbackRating }, { new: true });
+    const complaint = await Complaint.findByIdAndUpdate(req.params.id, { feedback, feedbackRating }, { returnDocument: 'after' });
     if (!complaint) return res.status(404).json({ success: false, message: 'Complaint not found' });
     res.json({ success: true, data: complaint });
   } catch (error) {

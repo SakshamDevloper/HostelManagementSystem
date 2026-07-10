@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Users, DoorOpen, CreditCard, AlertTriangle,
   LogOut, CalendarClock, UserCheck, ClipboardList, Bell,
-  UsersRound, FileText, Settings, Activity, Menu, X, Hotel
+  UsersRound, FileText, Settings, Activity, Menu, X, Hotel, ClipboardCheck, ArrowLeftRight
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useState } from 'react'
@@ -11,7 +11,9 @@ const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['admin', 'staff', 'student', 'parent'] },
   { to: '/students', icon: Users, label: 'Students', roles: ['admin', 'staff'] },
   { to: '/rooms', icon: DoorOpen, label: 'Rooms', roles: ['admin', 'staff'] },
-  { to: '/payments', icon: CreditCard, label: 'Payments', roles: ['admin', 'accountant'] },
+  { to: '/transfers', icon: ArrowLeftRight, label: 'Transfers', roles: ['admin', 'staff', 'student'] },
+  { to: '/payments', icon: CreditCard, label: 'Payments', roles: ['admin', 'staff', 'student'] },
+  { to: '/attendance', icon: ClipboardCheck, label: 'Attendance', roles: ['admin', 'staff', 'student'] },
   { to: '/complaints', icon: AlertTriangle, label: 'Complaints', roles: ['admin', 'staff', 'student'] },
   { to: '/leaves', icon: CalendarClock, label: 'Leaves', roles: ['admin', 'staff', 'student'] },
   { to: '/visitors', icon: UserCheck, label: 'Visitors', roles: ['admin', 'staff', 'security'] },
@@ -61,11 +63,19 @@ export default function Sidebar() {
 
       <div className="p-2 border-t border-base-300 space-y-1">
         <NavLink to="/profile" className={linkClass}>
-          <div className="avatar placeholder items-center flex">
-            <div className="bg-neutral text-neutral-content rounded-full w-6 h-6 text-xs">
-              {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+          {user?.photo ? (
+            <div className="avatar">
+              <div className="w-6 rounded-full">
+                <img src={user.photo} alt="" />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="avatar placeholder">
+              <div className="bg-neutral text-neutral-content rounded-full w-6 h-6 text-xs">
+                <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+              </div>
+            </div>
+          )}
           {!collapsed && <span className="text-sm truncate">{user?.name}</span>}
         </NavLink>
         <NavLink to="/settings" className={linkClass}>

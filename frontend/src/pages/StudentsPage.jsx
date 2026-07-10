@@ -126,11 +126,19 @@ export default function StudentsPage() {
                 <tr key={s._id} className="hover cursor-pointer" onClick={() => navigate(`/students/${s._id}`)}>
                   <td>
                     <div className="flex items-center gap-2">
-                      <div className="avatar placeholder">
-                        <div className="bg-primary text-primary-content rounded-full w-7 h-7 text-xs">
-                          {s.user?.name?.charAt(0) || 'S'}
+                      {s.user?.photo ? (
+                        <div className="avatar">
+                          <div className="w-7 rounded-full">
+                            <img src={s.user.photo} alt="" />
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="avatar placeholder">
+                          <div className="bg-primary text-primary-content rounded-full w-7 h-7 text-xs">
+                            <span>{s.user?.name?.charAt(0) || 'S'}</span>
+                          </div>
+                        </div>
+                      )}
                       <div>
                         <p className="text-sm font-medium">{s.user?.name}</p>
                         <p className="text-xs text-base-content/60">{s.user?.email}</p>
