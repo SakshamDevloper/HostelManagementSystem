@@ -48,6 +48,12 @@ app.use('/api/exports', require('./routes/exports'));
 app.use('/api/uploads', require('./routes/uploads'));
 app.use('/api/audit', require('./routes/audit'));
 
+const frontendDist = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendDist));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendDist, 'index.html'));
+});
+
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;

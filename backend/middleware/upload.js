@@ -1,13 +1,19 @@
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+
+const ensureDir = (dir) => {
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+};
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    let folder = 'uploads/others';
-    if (file.fieldname === 'photo') folder = 'uploads/photos';
-    else if (file.fieldname === 'document') folder = 'uploads/documents';
-    else if (file.fieldname === 'complaint') folder = 'uploads/complaints';
+    let folder = path.join(__dirname, '..', 'uploads', 'others');
+    if (file.fieldname === 'photo') folder = path.join(__dirname, '..', 'uploads', 'photos');
+    else if (file.fieldname === 'document') folder = path.join(__dirname, '..', 'uploads', 'documents');
+    else if (file.fieldname === 'complaint') folder = path.join(__dirname, '..', 'uploads', 'complaints');
+    ensureDir(folder);
     cb(null, folder);
   },
   filename: (req, file, cb) => {
