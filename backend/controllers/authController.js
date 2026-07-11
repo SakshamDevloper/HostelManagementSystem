@@ -12,7 +12,7 @@ exports.login = async (req, res, next) => {
     if (!user.isActive) {
       return res.status(401).json({ success: false, message: 'Account is deactivated' });
     }
-    generateToken(user._id, res);
+    generateToken(user._id, req, res);
     await logActivity({ user: user._id, action: 'login', resource: 'auth', resourceId: user._id, ip: req.ip });
     res.json({ success: true, user });
   } catch (error) {
@@ -21,7 +21,12 @@ exports.login = async (req, res, next) => {
 };
 
 exports.logout = async (req, res) => {
-  res.cookie('jwt', '', { httpOnly: true, expires: new Date(0) });
+  res.cookie('jwt', '', {
+    httpOnly: true,
+    secure: req.secure,
+    sameSite: 'lax',
+    expires: new Date(0),
+  });
   res.json({ success: true, message: 'Logged out' });
 };
 

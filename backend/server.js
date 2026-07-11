@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const path = require('path');
 require('dotenv').config();
+if (!process.env.NODE_ENV) process.env.NODE_ENV = 'production';
 
 const connectDB = require('./config/db');
 const { setupSocket } = require('./config/socket');
@@ -15,6 +16,8 @@ const app = express();
 const server = http.createServer(app);
 
 setupSocket(server);
+
+app.set('trust proxy', 1);
 
 app.use(cors({
   origin: process.env.CLIENT_URL || true,
