@@ -30,7 +30,7 @@ app.use(morgan('dev'));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.get('/api/health', (req, res) => {
+app.use('/api/health', (req, res) => {
   res.json({ success: true, message: 'Server is running', timestamp: new Date().toISOString() });
 });
 
@@ -50,6 +50,10 @@ app.use('/api/transfers', require('./routes/transfers'));
 app.use('/api/exports', require('./routes/exports'));
 app.use('/api/uploads', require('./routes/uploads'));
 app.use('/api/audit', require('./routes/audit'));
+
+app.use('/api', (req, res) => {
+  res.status(404).json({ success: false, message: 'API endpoint not found' });
+});
 
 const frontendDist = path.join(__dirname, '../frontend/dist');
 app.use(express.static(frontendDist));
