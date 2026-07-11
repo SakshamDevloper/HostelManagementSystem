@@ -89,8 +89,13 @@ const seedDatabase = async () => {
 
     const existingUsers = await User.countDocuments();
     if (existingUsers > 0) {
-      console.log('Database already has data, skipping seed');
-      return;
+      console.log('Database already has data, clearing and re-seeding...');
+      await User.deleteMany({});
+      await Student.deleteMany({});
+      await Room.deleteMany({});
+      await Payment.deleteMany({});
+      await Notice.deleteMany({});
+      await Staff.deleteMany({});
     }
 
     const adminUser = await User.create({ name: 'Admin User', email: 'admin@hostel.com', password: 'admin123', role: 'admin', phone: '9876543210', emailVerified: true });
