@@ -8,6 +8,13 @@ const path = require('path');
 require('dotenv').config();
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'production';
 
+console.log('🚀 Hostel Management System starting...');
+console.log('  NODE_ENV:', process.env.NODE_ENV);
+console.log('  PORT:', process.env.PORT || 'not set, will use 5000');
+console.log('  MONGODB_URI:', process.env.MONGODB_URI ? '✅ set' : '❌ NOT SET');
+console.log('  JWT_SECRET:', process.env.JWT_SECRET ? '✅ set' : '❌ NOT SET');
+console.log('  CLIENT_URL:', process.env.CLIENT_URL || 'not set (using default)');
+
 const connectDB = require('./config/db');
 const { setupSocket } = require('./config/socket');
 const errorHandler = require('./middleware/errorHandler');
@@ -29,6 +36,11 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use('/api', (req, res, next) => {
+  console.log(`[API ROUTE CHECK] ${req.method} ${req.originalUrl}`);
+  next();
+});
 
 app.use('/api/health', (req, res) => {
   res.json({ success: true, message: 'Server is running', timestamp: new Date().toISOString() });
@@ -130,11 +142,16 @@ const seedDatabase = async () => {
   }
 };
 
+server.listen(PORT, () => {
+  console.log(`\n🚀 Server listening on port ${PORT}`);
+  console.log('  (database connection in progress...)');
+});
+
 connectDB().then(async () => {
   await seedDatabase();
-  server.listen(PORT, () => {
-    console.log(`\n🚀 Server running on http://localhost:${PORT}`);
-  });
+  console.log('  ✅ Database connected and seeded');
+}).catch(err => {
+  console.error('  ❌ Database connection error:', err.message);
 });
 
 process.on('SIGINT', async () => {
