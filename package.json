@@ -2,7 +2,7 @@
   "name": "hostel-management",
   "private": true,
   "scripts": {
-    "build": "cd frontend && npm install && npm run build",
+    "build": "cd frontend && npm install && npx --yes vite build",
     "start": "node backend/server.js"
   }
 }
