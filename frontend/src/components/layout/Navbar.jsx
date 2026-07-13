@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Bell, Search, Moon, Sun, LogOut, User, Settings } from 'lucide-react'
+import { Bell, Search, Moon, Sun, LogOut, User, Settings, Menu } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
 import { useSocket } from '../../context/SocketContext'
 import api from '../../services/api'
 
-export default function Navbar() {
+export default function Navbar({ onMenuClick }) {
   const { user, logout } = useAuth()
   const { darkMode, toggleTheme } = useTheme()
   const { socket } = useSocket()
@@ -33,15 +33,13 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!socket) return
-    const handler = () => {
-      fetchUnreadCount()
-    }
+    const handler = () => { fetchUnreadCount() }
+    const urgentHandler = () => { fetchUnreadCount() }
     socket.on('notification:new', handler)
-    socket.on('announcement:urgent', () => {
-      fetchUnreadCount()
-    })
+    socket.on('announcement:urgent', urgentHandler)
     return () => {
       socket.off('notification:new', handler)
+      socket.off('announcement:urgent', urgentHandler)
     }
   }, [socket, fetchUnreadCount])
 
@@ -87,22 +85,29 @@ export default function Navbar() {
   }
 
   return (
-    <header className="h-16 bg-base-100 border-b border-base-300 flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30">
-      <div className="flex items-center gap-4">
-        <h1 className="text-lg font-semibold hidden sm:block">Hostel Management</h1>
+    <header className="h-16 bg-base-100 border-b border-base-300 flex items-center justify-between px-3 sm:px-4 lg:px-6 sticky top-0 z-30">
+      <div className="flex items-center gap-2 sm:gap-4">
+        <button onClick={onMenuClick} className="btn btn-ghost btn-sm btn-square lg:hidden">
+          <Menu size={20} />
+        </button>
+        <h1 className="text-base sm:text-lg font-semibold truncate">Hostel Management</h1>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         <div className="hidden md:flex items-center">
           <button onClick={() => setShowSearch(!showSearch)} className="btn btn-ghost btn-sm text-base-content/60">
             <Search size={16} />
-            <span className="text-xs ml-1">Search (Ctrl+K)</span>
+            <span className="text-xs ml-1 hidden lg:inline">Search (Ctrl+K)</span>
           </button>
         </div>
 
+        <button onClick={() => setShowSearch(true)} className="btn btn-ghost btn-sm btn-square md:hidden">
+          <Search size={18} />
+        </button>
+
         {showSearch && (
-          <div className="fixed inset-0 bg-black/30 z-50 flex items-start justify-center pt-20" onClick={() => { setShowSearch(false); setSearchResults([]) }}>
-            <div className="bg-base-100 rounded-2xl shadow-2xl w-full max-w-lg p-4" onClick={e => e.stopPropagation()}>
+          <div className="fixed inset-0 bg-black/30 z-50 flex items-start justify-center pt-16 sm:pt-20" onClick={() => { setShowSearch(false); setSearchResults([]) }}>
+            <div className="bg-base-100 rounded-2xl shadow-2xl w-full max-w-lg mx-3 p-4" onClick={e => e.stopPropagation()}>
               <div className="flex items-center gap-3 border-b border-base-300 pb-3">
                 <Search size={18} className="text-base-content/50" />
                 <input
@@ -113,7 +118,7 @@ export default function Navbar() {
                   onChange={handleSearch}
                   autoFocus
                 />
-                <kbd className="text-xs text-base-content/40 border border-base-300 px-1.5 py-0.5 rounded">ESC</kbd>
+                <kbd className="text-xs text-base-content/40 border border-base-300 px-1.5 py-0.5 rounded hidden sm:inline">ESC</kbd>
               </div>
               {searchResults.length > 0 && (
                 <div className="mt-3 space-y-1 max-h-60 overflow-y-auto">
@@ -136,9 +141,9 @@ export default function Navbar() {
                           </div>
                         </div>
                       )}
-                      <div>
-                        <p className="text-sm font-medium">{student.user?.name}</p>
-                        <p className="text-xs text-base-content/60">{student.studentId} — {student.room?.roomNumber || 'No room'}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium truncate">{student.user?.name}</p>
+                        <p className="text-xs text-base-content/60 truncate">{student.studentId} — {student.room?.roomNumber || 'No room'}</p>
                       </div>
                     </button>
                   ))}
@@ -160,7 +165,7 @@ export default function Navbar() {
             )}
           </button>
           {showNotifications && (
-            <div className="dropdown-content card card-compact bg-base-100 shadow-xl border border-base-300 w-80 mt-2">
+            <div className="dropdown-content card card-compact bg-base-100 shadow-xl border border-base-300 w-72 sm:w-80 mt-2 right-0">
               <div className="card-body p-3">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold text-sm">Notifications</h3>
@@ -205,9 +210,9 @@ export default function Navbar() {
               </div>
             )}
           </button>
-          <div className="dropdown-content card card-compact bg-base-100 shadow-xl border border-base-300 w-48 mt-2">
+          <div className="dropdown-content card card-compact bg-base-100 shadow-xl border border-base-300 w-48 mt-2 right-0">
             <div className="card-body p-2">
-              <div className="px-2 py-1 text-xs text-base-content/60">{user?.email}</div>
+              <div className="px-2 py-1 text-xs text-base-content/60 truncate">{user?.email}</div>
               <button onClick={() => navigate('/profile')} className="btn btn-ghost btn-sm justify-start gap-2">
                 <User size={14} /> Profile
               </button>

@@ -199,7 +199,7 @@ export default function RoomsPage() {
 
       <Modal isOpen={!!showAllocate} onClose={() => { setShowAllocate(null); setSelectedStudent('') }} title={`Allocate Room ${showAllocate?.roomNumber || ''}`}>
         <div className="space-y-3">
-          <p className="text-sm">Room: <strong>{showAllocate?.roomNumber}</strong> ({showAllocate?.availableSlots || 0} slots available)</p>
+          <p className="text-sm">Room: <strong>{showAllocate?.roomNumber}</strong> ({(showAllocate?.capacity || 0) - (showAllocate?.occupants?.length || 0)} slots available)</p>
           <div className="form-control">
             <label className="label py-0.5"><span className="label-text text-xs">Select Student</span></label>
             <select className="select select-bordered select-sm" value={selectedStudent} onChange={e => setSelectedStudent(e.target.value)}>

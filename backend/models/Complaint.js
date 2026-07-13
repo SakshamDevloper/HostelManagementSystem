@@ -15,7 +15,7 @@ const complaintSchema = new mongoose.Schema({
     default: 'pending',
   },
   resolvedAt: { type: Date },
-  resolvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Staff' },
+  resolvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   feedback: { type: String },
   feedbackRating: { type: Number, min: 1, max: 5 },
 }, { timestamps: true });

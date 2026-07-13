@@ -76,14 +76,14 @@ exports.getActivity = async (req, res, next) => {
 exports.getUpcoming = async (req, res, next) => {
   try {
     const today = new Date();
-    const weekLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-    const [upcomingCheckouts, pendingPayments] = await Promise.all([
-      Student.find({ status: 'active', checkOutDate: { $gte: today, $lte: weekLater } })
+    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const [recentCheckouts, pendingPayments] = await Promise.all([
+      Student.find({ status: 'checkedOut', checkOutDate: { $gte: weekAgo, $lte: today } })
         .populate('user', 'name').populate('room', 'roomNumber'),
       Payment.find({ status: 'pending' })
         .populate({ path: 'student', populate: { path: 'user', select: 'name' } }).limit(10),
     ]);
-    res.json({ success: true, data: { upcomingCheckouts, pendingPayments } });
+    res.json({ success: true, data: { recentCheckouts, pendingPayments } });
   } catch (error) {
     next(error);
   }

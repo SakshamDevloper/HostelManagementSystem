@@ -10,8 +10,11 @@ exports.getStudents = async (req, res, next) => {
     if (status) query.status = status;
     if (room) query.room = room;
     if (search) {
+      const nameUsers = await User.find({ name: { $regex: search, $options: 'i' } }).select('_id');
+      const userIds = nameUsers.map(u => u._id);
       query.$or = [
         { studentId: { $regex: search, $options: 'i' } },
+        { user: { $in: userIds } },
       ];
     }
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -73,7 +76,12 @@ exports.deleteStudent = async (req, res, next) => {
     const student = await Student.findById(req.params.id).populate('user');
     if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
     if (student.room) {
-      await Room.findByIdAndUpdate(student.room, { $pull: { occupants: student._id } });
+      const room = await Room.findById(student.room);
+      if (room) {
+        room.occupants = room.occupants.filter(o => o.toString() !== student._id.toString());
+        room.status = room.occupants.length === 0 ? 'available' : 'occupied';
+        await room.save();
+      }
     }
     await User.findByIdAndUpdate(student.user._id, { isActive: false });
     student.status = 'checkedOut';
@@ -90,7 +98,12 @@ exports.checkoutStudent = async (req, res, next) => {
     const student = await Student.findById(req.params.id);
     if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
     if (student.room) {
-      await Room.findByIdAndUpdate(student.room, { $pull: { occupants: student._id }, $set: { status: 'available' } });
+      const room = await Room.findById(student.room);
+      if (room) {
+        room.occupants = room.occupants.filter(o => o.toString() !== student._id.toString());
+        room.status = room.occupants.length === 0 ? 'available' : 'occupied';
+        await room.save();
+      }
     }
     student.status = 'checkedOut';
     student.checkOutDate = new Date();

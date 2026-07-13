@@ -5,6 +5,6 @@ const ctrl = require('../controllers/roomTransferController');
 router.use(protect);
 router.get('/', ctrl.getTransfers);
 router.post('/', authorize('admin', 'student'), ctrl.createTransfer);
-router.put('/:id/status', authorize('admin'), ctrl.updateTransferStatus);
+router.put('/:id/status', authorize('admin', 'warden'), ctrl.updateTransferStatus);
 
 module.exports = router;

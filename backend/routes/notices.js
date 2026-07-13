@@ -4,8 +4,8 @@ const ctrl = require('../controllers/noticeController');
 
 router.use(protect);
 router.get('/', ctrl.getNotices);
-router.post('/', authorize('admin', 'staff'), ctrl.createNotice);
-router.put('/:id', authorize('admin', 'staff'), ctrl.updateNotice);
-router.delete('/:id', authorize('admin'), ctrl.deleteNotice);
+router.post('/', authorize('admin', 'staff', 'warden'), ctrl.createNotice);
+router.put('/:id', authorize('admin', 'staff', 'warden'), ctrl.updateNotice);
+router.delete('/:id', authorize('admin', 'warden'), ctrl.deleteNotice);
 
 module.exports = router;

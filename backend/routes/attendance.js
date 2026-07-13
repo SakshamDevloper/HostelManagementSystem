@@ -5,7 +5,7 @@ const ctrl = require('../controllers/attendanceController');
 router.use(protect);
 router.get('/', ctrl.getAttendance);
 router.get('/summary', ctrl.getAttendanceSummary);
-router.post('/', authorize('admin', 'staff'), ctrl.markAttendance);
-router.post('/bulk', authorize('admin', 'staff'), ctrl.bulkMarkAttendance);
+router.post('/', authorize('admin', 'staff', 'warden'), ctrl.markAttendance);
+router.post('/bulk', authorize('admin', 'staff', 'warden'), ctrl.bulkMarkAttendance);
 
 module.exports = router;

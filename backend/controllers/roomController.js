@@ -70,17 +70,21 @@ exports.allocateRoom = async (req, res, next) => {
     if (!room) return res.status(404).json({ success: false, message: 'Room not found' });
     if (room.status === 'maintenance') return res.status(400).json({ success: false, message: 'Room under maintenance' });
     if (room.occupants.length >= room.capacity) return res.status(400).json({ success: false, message: 'Room is full' });
-    if (room.occupants.includes(studentId)) return res.status(400).json({ success: false, message: 'Student already in this room' });
+    if (room.occupants.some(o => o.toString() === studentId.toString())) return res.status(400).json({ success: false, message: 'Student already in this room' });
 
     const student = await Student.findById(studentId);
     if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
     if (student.room) {
-      await Room.findByIdAndUpdate(student.room, { $pull: { occupants: studentId } });
+      const oldRoom = await Room.findById(student.room);
+      if (oldRoom) {
+        oldRoom.occupants = oldRoom.occupants.filter(o => o.toString() !== studentId.toString());
+        oldRoom.status = oldRoom.occupants.length === 0 ? 'available' : 'occupied';
+        await oldRoom.save();
+      }
     }
 
     room.occupants.push(studentId);
-    if (room.occupants.length === room.capacity) room.status = 'occupied';
-    else room.status = 'occupied';
+    room.status = 'occupied';
     await room.save();
 
     student.room = room._id;

@@ -52,8 +52,20 @@ exports.updateTransferStatus = async (req, res, next) => {
     if (status === 'approved') {
       const student = await Student.findById(transfer.student);
       if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
-      await Room.findByIdAndUpdate(transfer.fromRoom, { $pull: { occupants: student._id } });
-      await Room.findByIdAndUpdate(transfer.toRoom, { $push: { occupants: student._id } });
+      const fromRoom = await Room.findById(transfer.fromRoom);
+      if (fromRoom) {
+        fromRoom.occupants = fromRoom.occupants.filter(o => o.toString() !== student._id.toString());
+        fromRoom.status = fromRoom.occupants.length === 0 ? 'available' : 'occupied';
+        await fromRoom.save();
+      }
+      const toRoom = await Room.findById(transfer.toRoom);
+      if (toRoom) {
+        if (!toRoom.occupants.some(o => o.toString() === student._id.toString())) {
+          toRoom.occupants.push(student._id);
+        }
+        toRoom.status = 'occupied';
+        await toRoom.save();
+      }
       student.room = transfer.toRoom;
       await student.save();
     }
