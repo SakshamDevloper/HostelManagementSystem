@@ -41,7 +41,12 @@ export default function LeavesPage() {
     submittingRef.current = true
     setSubmitting(true)
     try {
-      await createLeave(form)
+      const payload = {
+        ...form,
+        fromDate: new Date(form.fromDate).toISOString(),
+        toDate: new Date(form.toDate).toISOString(),
+      }
+      await createLeave(payload)
       toast.success('Leave request submitted')
       setShowModal(false)
       setForm({ fromDate: '', toDate: '', reason: '', destination: '', guardianContact: '' })
@@ -84,9 +89,9 @@ export default function LeavesPage() {
       <hr/>
       <div class="line"><span class="label">Student Name:</span><span class="value">${leave.student?.user?.name || 'N/A'}</span></div>
       <div class="line"><span class="label">Student ID:</span><span class="value">${leave.student?.studentId || 'N/A'}</span></div>
-      <div class="line"><span class="label">From Date:</span><span class="value">${new Date(leave.fromDate).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span></div>
-      <div class="line"><span class="label">To Date:</span><span class="value">${new Date(leave.toDate).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span></div>
-      <div class="line"><span class="label">Total Days:</span><span class="value">${Math.ceil((new Date(leave.toDate) - new Date(leave.fromDate)) / (1000 * 60 * 60 * 24)) + 1} day(s)</span></div>
+      <div class="line"><span class="label">From:</span><span class="value">${new Date(leave.fromDate).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} at ${new Date(leave.fromDate).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span></div>
+      <div class="line"><span class="label">To:</span><span class="value">${new Date(leave.toDate).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} at ${new Date(leave.toDate).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span></div>
+      <div class="line"><span class="label">Duration:</span><span class="value">${(() => { const diffMs = new Date(leave.toDate) - new Date(leave.fromDate); const hrs = Math.round(diffMs / (1000 * 60 * 60)); return hrs < 24 ? hrs + ' hour(s)' : Math.ceil(hrs / 24) + ' day(s)'; })()}</span></div>
       <div class="line"><span class="label">Reason:</span><span class="value">${leave.reason}</span></div>
       <div class="line"><span class="label">Going To (Destination):</span><span class="value">${leave.destination || 'N/A'}</span></div>
       <div class="line"><span class="label">Guardian Contact:</span><span class="value">${leave.guardianContact || 'N/A'}</span></div>
@@ -145,8 +150,8 @@ export default function LeavesPage() {
         </div>
       </div>
       <div class="line"><span class="label">Destination:</span><span class="value">${leave.destination || 'N/A'}</span></div>
-      <div class="line"><span class="label">Departure:</span><span class="value">${new Date(leave.fromDate).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span></div>
-      <div class="line"><span class="label">Return By:</span><span class="value">${new Date(leave.toDate).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span></div>
+      <div class="line"><span class="label">Departure:</span><span class="value">${new Date(leave.fromDate).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })} at ${new Date(leave.fromDate).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span></div>
+      <div class="line"><span class="label">Return By:</span><span class="value">${new Date(leave.toDate).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })} at ${new Date(leave.toDate).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span></div>
       <div class="line"><span class="label">Reason:</span><span class="value">${leave.reason}</span></div>
       <div class="line"><span class="label">Guardian:</span><span class="value">${leave.guardianContact || 'N/A'}</span></div>
       <div class="validity"><strong>Valid for exit & entry during above period</strong></div>
@@ -192,8 +197,8 @@ export default function LeavesPage() {
                   <span className="text-xs text-base-content/40">{new Date(l.createdAt).toLocaleDateString()}</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 mt-3 text-sm">
-                  <div><span className="text-xs text-base-content/60">From:</span> {new Date(l.fromDate).toLocaleDateString()}</div>
-                  <div><span className="text-xs text-base-content/60">To:</span> {new Date(l.toDate).toLocaleDateString()}</div>
+                  <div><span className="text-xs text-base-content/60">From:</span> {new Date(l.fromDate).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
+                  <div><span className="text-xs text-base-content/60">To:</span> {new Date(l.toDate).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
                   <div className="col-span-2"><span className="text-xs text-base-content/60">Reason:</span> {l.reason}</div>
                   <div className="col-span-2"><span className="text-xs text-base-content/60">Student:</span> {l.student?.user?.name}</div>
                 </div>
@@ -219,8 +224,8 @@ export default function LeavesPage() {
       <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Apply Leave">
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <div className="form-control"><label className="label py-0.5"><span className="label-text text-xs">From Date</span></label><input type="date" required className="input input-bordered input-sm" value={form.fromDate} onChange={e => setForm({ ...form, fromDate: e.target.value })} /></div>
-            <div className="form-control"><label className="label py-0.5"><span className="label-text text-xs">To Date</span></label><input type="date" required className="input input-bordered input-sm" value={form.toDate} onChange={e => setForm({ ...form, toDate: e.target.value })} /></div>
+            <div className="form-control"><label className="label py-0.5"><span className="label-text text-xs">Departure</span></label><input type="datetime-local" required className="input input-bordered input-sm" value={form.fromDate} onChange={e => setForm({ ...form, fromDate: e.target.value })} /></div>
+            <div className="form-control"><label className="label py-0.5"><span className="label-text text-xs">Return By</span></label><input type="datetime-local" required className="input input-bordered input-sm" value={form.toDate} onChange={e => setForm({ ...form, toDate: e.target.value })} /></div>
           </div>
           <div className="form-control"><label className="label py-0.5"><span className="label-text text-xs">Reason</span></label><textarea required className="textarea textarea-bordered text-sm h-20" value={form.reason} onChange={e => setForm({ ...form, reason: e.target.value })} /></div>
           <div className="grid grid-cols-2 gap-3">
