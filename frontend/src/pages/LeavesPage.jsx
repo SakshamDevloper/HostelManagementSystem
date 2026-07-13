@@ -107,6 +107,8 @@ export default function LeavesPage() {
 
   const handlePrintGatepass = (leave) => {
     const origin = window.location.origin
+    const now = new Date()
+    const dateTimeStr = now.toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) + ' ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
     const photoUrl = leave.student?.user?.photo
       ? (leave.student.user.photo.startsWith('http') ? leave.student.user.photo : `${origin}${leave.student.user.photo}`)
       : null
@@ -114,7 +116,8 @@ export default function LeavesPage() {
     printWindow.document.write(`
       <html><head><title>Gate Pass</title>
       <style>
-        body { font-family: 'Courier New', monospace; padding: 40px; max-width: 550px; margin: auto; border: 3px double #000; }
+        body { font-family: 'Mariam', 'Georgia', 'Times New Roman', serif; padding: 40px; max-width: 550px; margin: auto; border: 3px double #000; }
+        .datetime { text-align: right; font-size: 11px; color: #666; margin-bottom: 4px; }
         h1 { text-align: center; font-size: 22px; margin-bottom: 2px; }
         .subtitle { text-align: center; font-size: 11px; color: #666; margin-bottom: 20px; }
         .header { display: flex; align-items: center; gap: 20px; margin-bottom: 15px; }
@@ -130,6 +133,7 @@ export default function LeavesPage() {
         .validity { text-align: center; font-size: 12px; margin: 15px 0; padding: 8px; border: 1px solid #999; background: #f5f5f5; }
         @media print { body { padding: 20px; border: 3px double #000; } }
       </style></head><body>
+      <div class="datetime">Printed: ${dateTimeStr}</div>
       <h1>GATE PASS</h1>
       <p class="subtitle">Hostel Entry / Exit Permit</p>
       <hr/>
