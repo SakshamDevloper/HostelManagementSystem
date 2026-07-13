@@ -236,13 +236,17 @@ const seed = async () => {
       }
     }
 
+    const roomUpdates = await Student.aggregate([
+      { $match: { room: { $ne: null } } },
+      { $group: { _id: '$room', occupantIds: { $push: '$_id' } } },
+    ]);
+
     let occupiedRooms = 0;
-    for (const r of createdRooms) {
-      if (r.occupants.length > 0) {
-        r.status = 'occupied';
-        occupiedRooms++;
-      }
-      await r.save();
+    for (const group of roomUpdates) {
+      await Room.findByIdAndUpdate(group._id, {
+        $set: { occupants: group.occupantIds, status: 'occupied' },
+      });
+      occupiedRooms++;
     }
 
     console.log('\n✅ Seed completed!');

@@ -25,6 +25,21 @@ exports.getTransfers = async (req, res, next) => {
   }
 };
 
+exports.getTransfer = async (req, res, next) => {
+  try {
+    const transfer = await RoomTransfer.findById(req.params.id)
+      .populate('fromRoom', 'roomNumber')
+      .populate('toRoom', 'roomNumber')
+      .populate({ path: 'student', populate: { path: 'user', select: 'name email' } })
+      .populate('requestedBy', 'name')
+      .populate('approvedBy', 'name');
+    if (!transfer) return res.status(404).json({ success: false, message: 'Transfer not found' });
+    res.json({ success: true, data: transfer });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.createTransfer = async (req, res, next) => {
   try {
     let studentId = req.body.student;

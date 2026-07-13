@@ -5,7 +5,7 @@ const logActivity = require('../utils/logger');
 exports.getStaff = async (req, res, next) => {
   try {
     const { designation, search } = req.query;
-    const query = {};
+    const query = { isActive: true };
     if (designation) query.designation = designation;
     if (search) query.staffId = { $regex: search, $options: 'i' };
     const staff = await Staff.find(query).populate('user', 'name email phone photo').sort({ createdAt: -1 });
