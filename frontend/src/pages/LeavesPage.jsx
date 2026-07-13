@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
-import { Plus, CalendarClock, Printer } from 'lucide-react'
+import { Plus, CalendarClock, Printer, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Modal from '../components/common/Modal'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import EmptyState from '../components/common/EmptyState'
 import { useAuth } from '../context/AuthContext'
-import { getLeaves, createLeave, updateLeaveStatus } from '../services/leaveService'
+import { getLeaves, createLeave, updateLeaveStatus, deleteLeave } from '../services/leaveService'
 
 const statusColors = { pending: 'badge-warning', approved: 'badge-success', rejected: 'badge-error', expired: 'badge-ghost' }
 
@@ -17,7 +17,7 @@ export default function LeavesPage() {
   const [showModal, setShowModal] = useState(false)
   const [filterStatus, setFilterStatus] = useState('')
   const [form, setForm] = useState({ fromDate: '', toDate: '', reason: '', destination: '', guardianContact: '' })
-  const canManage = ['admin', 'staff', 'warden'].includes(user?.role)
+  const canManage = user?.role === 'warden'
   const fetchingRef = useRef(false)
   const submittingRef = useRef(false)
 
@@ -61,6 +61,15 @@ export default function LeavesPage() {
       toast.success(`Leave ${status}`)
       fetchLeaves()
     } catch (err) { toast.error('Failed to update') }
+  }
+
+  const handleDelete = async (id) => {
+    if (!confirm('Delete this leave request?')) return
+    try {
+      await deleteLeave(id)
+      toast.success('Leave deleted')
+      fetchLeaves()
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed to delete') }
   }
 
   const handlePrint = (leave) => {
@@ -212,6 +221,11 @@ export default function LeavesPage() {
               <div className="flex gap-1 mt-1">
                 <button onClick={() => handlePrint(l)} className="btn btn-ghost btn-xs text-primary"><Printer size={12} /> Print</button>
                 {l.status === 'approved' && <button onClick={() => handlePrintGatepass(l)} className="btn btn-ghost btn-xs text-secondary"><Printer size={12} /> Gatepass</button>}
+              </div>
+            )}
+            {(['rejected', 'expired'].includes(l.status) || (l.status === 'approved' && new Date(l.toDate) < new Date())) && (
+              <div className="flex mt-1">
+                <button onClick={() => handleDelete(l._id)} className="btn btn-ghost btn-xs text-error"><Trash2 size={12} /> Delete</button>
               </div>
             )}
                 {l.remarks && <p className="text-xs text-base-content/60 mt-2">Remarks: {l.remarks}</p>}

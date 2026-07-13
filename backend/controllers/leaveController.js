@@ -44,6 +44,30 @@ exports.createLeave = async (req, res, next) => {
   }
 };
 
+exports.deleteLeave = async (req, res, next) => {
+  try {
+    const leave = await LeaveRequest.findById(req.params.id);
+    if (!leave) return res.status(404).json({ success: false, message: 'Leave request not found' });
+
+    const deletable = ['rejected', 'expired'].includes(leave.status) || new Date(leave.toDate) < new Date();
+    if (!deletable) {
+      return res.status(400).json({ success: false, message: 'Can only delete expired, rejected, or completed leaves' });
+    }
+
+    if (req.user.role === 'student') {
+      const student = await Student.findOne({ user: req.user._id });
+      if (!student || String(student._id) !== String(leave.student)) {
+        return res.status(403).json({ success: false, message: 'Not authorized' });
+      }
+    }
+
+    await LeaveRequest.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Leave request deleted' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.updateLeaveStatus = async (req, res, next) => {
   try {
     const { status, remarks } = req.body;
