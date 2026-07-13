@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
-import { Plus, AlertTriangle, Search } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Plus, AlertTriangle } from 'lucide-react'
 import { useSocket } from '../context/SocketContext'
+import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
 import Modal from '../components/common/Modal'
 import LoadingSpinner from '../components/common/LoadingSpinner'
@@ -12,21 +13,28 @@ const statusColors = { pending: 'badge-warning', inProgress: 'badge-info', resol
 
 export default function ComplaintsPage() {
   const { socket } = useSocket()
+  const { user } = useAuth()
   const [complaints, setComplaints] = useState([])
   const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [filterStatus, setFilterStatus] = useState('')
   const [form, setForm] = useState({ category: 'plumbing', description: '' })
   const [feedbackForm, setFeedbackForm] = useState({ id: null, feedback: '', feedbackRating: 5 })
+  const canManage = user?.role === 'admin' || user?.role === 'staff'
+  const fetchingRef = useRef(false)
+  const submittingRef = useRef(false)
 
   const fetchComplaints = async () => {
+    if (fetchingRef.current) return
+    fetchingRef.current = true
     try {
       const params = {}
       if (filterStatus) params.status = filterStatus
       const { data } = await getComplaints(params)
       setComplaints(data.data || [])
     } catch { toast.error('Failed to load complaints') }
-    finally { setLoading(false) }
+    finally { setLoading(false); fetchingRef.current = false }
   }
 
   useEffect(() => { fetchComplaints() }, [filterStatus])
@@ -39,10 +47,13 @@ export default function ComplaintsPage() {
       socket.off('complaint:new', fetchComplaints)
       socket.off('complaint:statusChange', fetchComplaints)
     }
-  }, [socket])
+  }, [socket, fetchComplaints])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (submittingRef.current) return
+    submittingRef.current = true
+    setSubmitting(true)
     try {
       await createComplaint(form)
       toast.success('Complaint submitted')
@@ -50,6 +61,7 @@ export default function ComplaintsPage() {
       setForm({ category: 'plumbing', description: '' })
       fetchComplaints()
     } catch (err) { toast.error(err.response?.data?.message || 'Failed to submit') }
+    finally { submittingRef.current = false; setSubmitting(false) }
   }
 
   const handleStatus = async (id, status) => {
@@ -105,12 +117,12 @@ export default function ComplaintsPage() {
                   <div className="text-xs text-base-content/40">{new Date(c.createdAt).toLocaleDateString()}</div>
                 </div>
                 <p className="text-sm mt-2">{c.description}</p>
-                <div className="flex items-center justify-between mt-3 pt-2 border-t border-base-200">
+                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-base-200">
                   <span className="text-xs text-base-content/60">{c.student?.user?.name}</span>
                   <div className="flex gap-1">
-                    {c.status === 'pending' && <button onClick={() => handleStatus(c._id, 'inProgress')} className="btn btn-ghost btn-xs">Start</button>}
-                    {['pending', 'inProgress'].includes(c.status) && <button onClick={() => handleStatus(c._id, 'resolved')} className="btn btn-ghost btn-xs text-success">Resolve</button>}
-                    {c.status === 'resolved' && !c.feedback && (
+                    {canManage && c.status === 'pending' && <button onClick={() => handleStatus(c._id, 'inProgress')} className="btn btn-ghost btn-xs">Start</button>}
+                    {canManage && ['pending', 'inProgress'].includes(c.status) && <button onClick={() => handleStatus(c._id, 'resolved')} className="btn btn-ghost btn-xs text-success">Resolve</button>}
+                    {!canManage && c.status === 'resolved' && !c.feedback && (
                       <button onClick={() => setFeedbackForm({ id: c._id, feedback: '', feedbackRating: 5 })} className="btn btn-ghost btn-xs text-primary">Feedback</button>
                     )}
                   </div>
@@ -147,7 +159,7 @@ export default function ComplaintsPage() {
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={() => setShowModal(false)} className="btn btn-ghost btn-sm">Cancel</button>
-            <button type="submit" className="btn btn-primary btn-sm">Submit</button>
+            <button type="submit" className="btn btn-primary btn-sm" disabled={submitting}>{submitting ? 'Submitting...' : 'Submit'}</button>
           </div>
         </form>
       </Modal>

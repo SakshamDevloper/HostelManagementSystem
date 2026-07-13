@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Plus, ClipboardList, Megaphone, Bell } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Modal from '../components/common/Modal'
@@ -14,10 +14,12 @@ export default function NoticesPage() {
   const { user } = useAuth()
   const [notices, setNotices] = useState([])
   const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ title: '', content: '', priority: 'normal', targetAudience: 'all' })
   const isAdmin = user?.role === 'admin' || user?.role === 'staff'
+  const submittingRef = useRef(false)
 
   const fetchNotices = async () => {
     try {
@@ -31,6 +33,9 @@ export default function NoticesPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (submittingRef.current) return
+    submittingRef.current = true
+    setSubmitting(true)
     try {
       if (editing) {
         await updateNotice(editing, form)
@@ -44,6 +49,7 @@ export default function NoticesPage() {
       setForm({ title: '', content: '', priority: 'normal', targetAudience: 'all' })
       fetchNotices()
     } catch (err) { toast.error(err.response?.data?.message || 'Failed') }
+    finally { submittingRef.current = false; setSubmitting(false) }
   }
 
   const handleDelete = async (id) => {
@@ -115,7 +121,7 @@ export default function NoticesPage() {
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={() => setShowModal(false)} className="btn btn-ghost btn-sm">Cancel</button>
-            <button type="submit" className="btn btn-primary btn-sm">{editing ? 'Update' : 'Post'}</button>
+            <button type="submit" className="btn btn-primary btn-sm" disabled={submitting}>{submitting ? 'Posting...' : editing ? 'Update' : 'Post'}</button>
           </div>
         </form>
       </Modal>

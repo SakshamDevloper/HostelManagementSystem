@@ -31,9 +31,18 @@ exports.createComplaint = async (req, res, next) => {
     if (!student && req.user.role === 'student') {
       return res.status(400).json({ success: false, message: 'Student profile not found' });
     }
+    const studentId = req.body.student || student?._id;
+    const recent = await Complaint.findOne({
+      student: studentId,
+      description: req.body.description,
+      createdAt: { $gte: new Date(Date.now() - 30000) },
+    });
+    if (recent) {
+      return res.status(429).json({ success: false, message: 'Duplicate complaint detected. Please wait before submitting again.' });
+    }
     const data = {
       ...req.body,
-      student: req.body.student || student?._id,
+      student: studentId,
     };
     const complaint = await Complaint.create(data);
     await logActivity({ user: req.user._id, action: 'create', resource: 'complaint', resourceId: complaint._id, details: { category: complaint.category }, ip: req.ip });
@@ -78,9 +87,17 @@ exports.updateComplaintStatus = async (req, res, next) => {
 
 exports.addFeedback = async (req, res, next) => {
   try {
-    const { feedback, feedbackRating } = req.body;
-    const complaint = await Complaint.findByIdAndUpdate(req.params.id, { feedback, feedbackRating }, { returnDocument: 'after' });
+    const complaint = await Complaint.findById(req.params.id);
     if (!complaint) return res.status(404).json({ success: false, message: 'Complaint not found' });
+    if (req.user.role === 'student') {
+      const student = await Student.findOne({ user: req.user._id });
+      if (!student || complaint.student.toString() !== student._id.toString()) {
+        return res.status(403).json({ success: false, message: 'Not authorized to give feedback on this complaint' });
+      }
+    }
+    complaint.feedback = req.body.feedback;
+    complaint.feedbackRating = req.body.feedbackRating;
+    await complaint.save();
     res.json({ success: true, data: complaint });
   } catch (error) {
     next(error);

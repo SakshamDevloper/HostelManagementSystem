@@ -10,6 +10,7 @@ import { getStaff, createStaff, updateStaff, deleteStaff } from '../services/sta
 export default function StaffPage() {
   const [staff, setStaff] = useState([])
   const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [editing, setEditing] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
@@ -31,6 +32,8 @@ export default function StaffPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (submitting) return
+    setSubmitting(true)
     try {
       if (editing) {
         await updateStaff(editing, form)
@@ -44,6 +47,7 @@ export default function StaffPage() {
       setForm({ name: '', email: '', password: 'password123', phone: '', staffId: '', designation: 'warden', salary: '', shift: 'general' })
       fetchStaff()
     } catch (err) { toast.error(err.response?.data?.message || 'Operation failed') }
+    finally { setSubmitting(false) }
   }
 
   const handleDelete = async () => {
@@ -156,7 +160,7 @@ export default function StaffPage() {
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={() => setShowModal(false)} className="btn btn-ghost btn-sm">Cancel</button>
-            <button type="submit" className="btn btn-primary btn-sm">{editing ? 'Update' : 'Create'}</button>
+            <button type="submit" className="btn btn-primary btn-sm" disabled={submitting}>{submitting ? 'Saving...' : editing ? 'Update' : 'Create'}</button>
           </div>
         </form>
       </Modal>

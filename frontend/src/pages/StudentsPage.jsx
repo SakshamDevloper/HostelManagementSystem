@@ -12,6 +12,7 @@ export default function StudentsPage() {
   const navigate = useNavigate()
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [showBulk, setShowBulk] = useState(false)
@@ -32,6 +33,8 @@ export default function StudentsPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (submitting) return
+    setSubmitting(true)
     try {
       if (editing) {
         await updateStudent(editing, form)
@@ -45,6 +48,7 @@ export default function StudentsPage() {
       setForm({ name: '', email: '', password: 'password123', phone: '', studentId: '', gender: 'male' })
       fetchStudents()
     } catch (err) { toast.error(err.response?.data?.message || 'Operation failed') }
+    finally { setSubmitting(false) }
   }
 
   const handleDelete = async () => {
@@ -184,7 +188,7 @@ export default function StudentsPage() {
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={() => setShowModal(false)} className="btn btn-ghost btn-sm">Cancel</button>
-            <button type="submit" className="btn btn-primary btn-sm">{editing ? 'Update' : 'Create'}</button>
+            <button type="submit" className="btn btn-primary btn-sm" disabled={submitting}>{submitting ? 'Saving...' : editing ? 'Update' : 'Create'}</button>
           </div>
         </form>
       </Modal>
@@ -194,7 +198,7 @@ export default function StudentsPage() {
         <textarea className="textarea textarea-bordered w-full h-48 text-sm font-mono" value={bulkCsv} onChange={e => setBulkCsv(e.target.value)} placeholder={`John Doe, john@example.com, STU001, 1234567890\nJane Doe, jane@example.com, STU002, 9876543210`} />
         <div className="flex justify-end gap-2 mt-3">
           <button onClick={() => setShowBulk(false)} className="btn btn-ghost btn-sm">Cancel</button>
-          <button onClick={handleBulkImport} className="btn btn-primary btn-sm">Import</button>
+          <button onClick={handleBulkImport} className="btn btn-primary btn-sm" disabled={submitting}>{submitting ? 'Importing...' : 'Import'}</button>
         </div>
       </Modal>
 

@@ -11,6 +11,7 @@ import { getStudents } from '../services/studentService'
 export default function RoomTransfersPage() {
   const [transfers, setTransfers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [statusFilter, setStatusFilter] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [rooms, setRooms] = useState([])
@@ -43,9 +44,11 @@ export default function RoomTransfersPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (submitting) return
     if (form.fromRoom === form.toRoom) {
       return toast.error('Source and destination rooms must be different')
     }
+    setSubmitting(true)
     try {
       await createTransfer(form)
       toast.success('Transfer request created')
@@ -53,6 +56,7 @@ export default function RoomTransfersPage() {
       setForm({ student: '', fromRoom: '', toRoom: '', reason: '' })
       fetchTransfers()
     } catch (err) { toast.error(err.response?.data?.message || 'Failed to create transfer') }
+    finally { setSubmitting(false) }
   }
 
   const handleStatusUpdate = async (id, status) => {
@@ -189,7 +193,7 @@ export default function RoomTransfersPage() {
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={() => setShowModal(false)} className="btn btn-ghost btn-sm">Cancel</button>
-            <button type="submit" className="btn btn-primary btn-sm">Request Transfer</button>
+            <button type="submit" className="btn btn-primary btn-sm" disabled={submitting}>{submitting ? 'Submitting...' : 'Request Transfer'}</button>
           </div>
         </form>
       </Modal>

@@ -13,6 +13,7 @@ export default function PaymentsPage() {
   const [payments, setPayments] = useState([])
   const [dues, setDues] = useState([])
   const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [showDues, setShowDues] = useState(false)
   const [students, setStudents] = useState([])
@@ -39,6 +40,8 @@ export default function PaymentsPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (submitting) return
+    setSubmitting(true)
     try {
       await createPayment({ ...form, amount: parseFloat(form.amount) })
       toast.success('Payment recorded')
@@ -46,6 +49,7 @@ export default function PaymentsPage() {
       setForm({ student: '', amount: '', month: new Date().getMonth() + 1, year: new Date().getFullYear(), type: 'rent', paymentMethod: 'cash', notes: '' })
       fetchPayments()
     } catch (err) { toast.error(err.response?.data?.message || 'Failed to record payment') }
+    finally { setSubmitting(false) }
   }
 
   const openAddPayment = async () => {
@@ -193,7 +197,7 @@ export default function PaymentsPage() {
           <div className="form-control"><label className="label py-0.5"><span className="label-text text-xs">Notes</span></label><input className="input input-bordered input-sm" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} /></div>
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={() => setShowModal(false)} className="btn btn-ghost btn-sm">Cancel</button>
-            <button type="submit" className="btn btn-primary btn-sm">Record</button>
+            <button type="submit" className="btn btn-primary btn-sm" disabled={submitting}>{submitting ? 'Recording...' : 'Record'}</button>
           </div>
         </form>
       </Modal>

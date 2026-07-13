@@ -9,6 +9,7 @@ import { getVisitors, createVisitor, checkoutVisitor } from '../services/visitor
 export default function VisitorsPage() {
   const [visitors, setVisitors] = useState([])
   const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [search, setSearch] = useState('')
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
@@ -28,6 +29,8 @@ export default function VisitorsPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (submitting) return
+    setSubmitting(true)
     try {
       await createVisitor(form)
       toast.success('Visitor logged in')
@@ -35,6 +38,7 @@ export default function VisitorsPage() {
       setForm({ name: '', contact: '', vehicle: '', purpose: '', visitingStudent: '', visitingRoom: '' })
       fetchVisitors()
     } catch (err) { toast.error(err.response?.data?.message || 'Failed') }
+    finally { setSubmitting(false) }
   }
 
   const handleCheckout = async (id) => {
@@ -99,7 +103,7 @@ export default function VisitorsPage() {
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={() => setShowModal(false)} className="btn btn-ghost btn-sm">Cancel</button>
-            <button type="submit" className="btn btn-primary btn-sm">Log Entry</button>
+            <button type="submit" className="btn btn-primary btn-sm" disabled={submitting}>{submitting ? 'Logging...' : 'Log Entry'}</button>
           </div>
         </form>
       </Modal>

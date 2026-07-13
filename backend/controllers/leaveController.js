@@ -26,6 +26,15 @@ exports.createLeave = async (req, res, next) => {
   try {
     const student = await Student.findOne({ user: req.user._id });
     if (!student) return res.status(400).json({ success: false, message: 'Student profile not found' });
+    const recent = await LeaveRequest.findOne({
+      student: student._id,
+      fromDate: req.body.fromDate,
+      toDate: req.body.toDate,
+      createdAt: { $gte: new Date(Date.now() - 30000) },
+    });
+    if (recent) {
+      return res.status(429).json({ success: false, message: 'Duplicate leave request detected. Please wait before submitting again.' });
+    }
     const leave = await LeaveRequest.create({ ...req.body, student: student._id });
     const populated = await LeaveRequest.findById(leave._id)
       .populate({ path: 'student', populate: { path: 'user', select: 'name' } });

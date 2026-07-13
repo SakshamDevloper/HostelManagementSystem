@@ -100,8 +100,15 @@ exports.getAttendanceSummary = async (req, res, next) => {
     const start = new Date(Date.UTC(y, m - 1, 1));
     const end = new Date(Date.UTC(y, m, 0, 23, 59, 59, 999));
 
+    const match = { date: { $gte: start, $lte: end } };
+
+    if (req.user.role === 'student') {
+      const student = await Student.findOne({ user: req.user._id });
+      if (student) match.student = student._id;
+    }
+
     const summary = await Attendance.aggregate([
-      { $match: { date: { $gte: start, $lte: end } } },
+      { $match: match },
       { $group: { _id: '$student', present: { $sum: { $cond: [{ $eq: ['$status', 'present'] }, 1, 0] } }, absent: { $sum: { $cond: [{ $eq: ['$status', 'absent'] }, 1, 0] } }, leave: { $sum: { $cond: [{ $eq: ['$status', 'leave'] }, 1, 0] } }, late: { $sum: { $cond: [{ $eq: ['$status', 'late'] }, 1, 0] } }, total: { $sum: 1 } } },
       { $sort: { present: -1 } },
     ]);

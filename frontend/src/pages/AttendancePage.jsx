@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react'
-import { Check, X, Clock, AlertCircle } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Check, X, Clock, AlertCircle, Users, CheckCheck } from 'lucide-react'
 import toast from 'react-hot-toast'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import EmptyState from '../components/common/EmptyState'
 import { useAuth } from '../context/AuthContext'
-import { getAttendance, markAttendance, getAttendanceSummary } from '../services/attendanceService'
+import { getAttendance, markAttendance, bulkMarkAttendance, getAttendanceSummary } from '../services/attendanceService'
 import { getStudents } from '../services/studentService'
 
 const statusColors = { present: 'badge-success', absent: 'badge-error', leave: 'badge-warning', late: 'badge-info' }
@@ -22,8 +22,11 @@ export default function AttendancePage() {
   const [markMode, setMarkMode] = useState(false)
 
   const isAdminOrStaff = user?.role === 'admin' || user?.role === 'staff'
+  const fetchingRef = useRef(false)
 
   const fetchData = async () => {
+    if (fetchingRef.current) return
+    fetchingRef.current = true
     try {
       if (view === 'daily') {
         const [recRes, stuRes] = await Promise.all([
@@ -37,12 +40,11 @@ export default function AttendancePage() {
         setSummary(sumRes.data.data || [])
       }
     } catch { toast.error('Failed to load attendance') }
-    finally { setLoading(false) }
+    finally { setLoading(false); fetchingRef.current = false }
   }
 
   useEffect(() => { fetchData() }, [view, selectedDate, selectedMonth, selectedYear])
 
-  const isPresent = (studentId) => records.some(r => r.student?._id === studentId && r.status === 'present')
   const getRecordStatus = (studentId) => records.find(r => r.student?._id === studentId)?.status || null
 
   const handleMark = async (studentId, status) => {
@@ -51,6 +53,17 @@ export default function AttendancePage() {
       toast.success(`Marked ${status}`)
       fetchData()
     } catch (err) { toast.error(err.response?.data?.message || 'Failed') }
+  }
+
+  const handleMarkAllPresent = async () => {
+    const unmarked = students.filter(s => !getRecordStatus(s._id))
+    if (unmarked.length === 0) return toast.error('All students already marked')
+    try {
+      const records = unmarked.map(s => ({ studentId: s._id, date: selectedDate, status: 'present' }))
+      await bulkMarkAttendance({ records })
+      toast.success(`Marked ${unmarked.length} students present`)
+      fetchData()
+    } catch (err) { toast.error('Failed to mark all') }
   }
 
   if (loading) return <LoadingSpinner fullScreen={false} />
@@ -74,8 +87,14 @@ export default function AttendancePage() {
 
       {view === 'daily' ? (
         <>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <input type="date" className="input input-bordered input-sm" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} />
+            <div className="text-xs text-base-content/40 flex items-center gap-1"><Users size={14} /> {students.length} students</div>
+            {markMode && (
+              <button onClick={handleMarkAllPresent} className="btn btn-ghost btn-xs text-success">
+                <CheckCheck size={14} /> Mark All Present
+              </button>
+            )}
           </div>
 
           {students.length === 0 ? (
