@@ -13,7 +13,7 @@ exports.getLeaves = async (req, res, next) => {
       if (student) query.student = student._id;
     }
     const leaves = await LeaveRequest.find(query)
-      .populate({ path: 'student', populate: { path: 'user', select: 'name' } })
+      .populate({ path: 'student', populate: { path: 'user', select: 'name photo' } })
       .populate('approvedBy', 'name')
       .sort({ createdAt: -1 });
     res.json({ success: true, data: leaves });
@@ -37,7 +37,7 @@ exports.createLeave = async (req, res, next) => {
     }
     const leave = await LeaveRequest.create({ ...req.body, student: student._id });
     const populated = await LeaveRequest.findById(leave._id)
-      .populate({ path: 'student', populate: { path: 'user', select: 'name' } });
+      .populate({ path: 'student', populate: { path: 'user', select: 'name photo' } });
     res.status(201).json({ success: true, data: populated });
   } catch (error) {
     next(error);
@@ -48,7 +48,7 @@ exports.updateLeaveStatus = async (req, res, next) => {
   try {
     const { status, remarks } = req.body;
     const leave = await LeaveRequest.findByIdAndUpdate(req.params.id, { status, approvedBy: req.user._id, remarks }, { returnDocument: 'after' })
-      .populate({ path: 'student', populate: { path: 'user', select: 'name email _id' } });
+      .populate({ path: 'student', populate: { path: 'user', select: 'name photo email _id' } });
     if (!leave) return res.status(404).json({ success: false, message: 'Leave request not found' });
     if (leave.student?.user?._id) {
       await createNotification({

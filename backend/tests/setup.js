@@ -33,6 +33,17 @@ const createTestAdmin = async () => {
   });
 };
 
+const createTestWarden = async () => {
+  return User.create({
+    name: 'Warden User',
+    email: 'warden@test.com',
+    password: 'password123',
+    role: 'warden',
+    phone: '9876543214',
+    emailVerified: true,
+  });
+};
+
 const createTestStaffUser = async () => {
   return User.create({
     name: 'Staff User',
@@ -88,6 +99,7 @@ module.exports = {
   disconnectDB,
   clearDB,
   createTestAdmin,
+  createTestWarden,
   createTestStaffUser,
   createTestStudentUser,
   createTestRoom,

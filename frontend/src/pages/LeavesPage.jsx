@@ -107,14 +107,20 @@ export default function LeavesPage() {
 
   const handlePrintGatepass = (leave) => {
     const origin = window.location.origin
+    const photoUrl = leave.student?.user?.photo
+      ? (leave.student.user.photo.startsWith('http') ? leave.student.user.photo : `${origin}${leave.student.user.photo}`)
+      : null
     const printWindow = window.open('', '_blank')
     printWindow.document.write(`
       <html><head><title>Gate Pass</title>
       <style>
-        body { font-family: 'Courier New', monospace; padding: 40px; max-width: 500px; margin: auto; border: 3px double #000; }
+        body { font-family: 'Courier New', monospace; padding: 40px; max-width: 550px; margin: auto; border: 3px double #000; }
         h1 { text-align: center; font-size: 22px; margin-bottom: 2px; }
         .subtitle { text-align: center; font-size: 11px; color: #666; margin-bottom: 20px; }
-        .line { display: flex; padding: 5px 0; font-size: 14px; }
+        .header { display: flex; align-items: center; gap: 20px; margin-bottom: 15px; }
+        .photo { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #999; flex-shrink: 0; }
+        .info { flex: 1; }
+        .line { display: flex; padding: 4px 0; font-size: 14px; }
         .label { width: 130px; font-weight: bold; }
         .value { flex: 1; border-bottom: 1px solid #999; padding: 0 6px; }
         .auth { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #999; }
@@ -127,8 +133,13 @@ export default function LeavesPage() {
       <h1>GATE PASS</h1>
       <p class="subtitle">Hostel Entry / Exit Permit</p>
       <hr/>
-      <div class="line"><span class="label">Student Name:</span><span class="value">${leave.student?.user?.name || 'N/A'}</span></div>
-      <div class="line"><span class="label">Student ID:</span><span class="value">${leave.student?.studentId || 'N/A'}</span></div>
+      <div class="header">
+        ${photoUrl ? `<img src="${photoUrl}" alt="Student Photo" class="photo" />` : '<div class="photo" style="background:#eee; display:flex; align-items:center; justify-content:center; color:#999; font-size:28px;">?</div>'}
+        <div class="info">
+          <div class="line"><span class="label">Student Name:</span><span class="value">${leave.student?.user?.name || 'N/A'}</span></div>
+          <div class="line"><span class="label">Student ID:</span><span class="value">${leave.student?.studentId || 'N/A'}</span></div>
+        </div>
+      </div>
       <div class="line"><span class="label">Destination:</span><span class="value">${leave.destination || 'N/A'}</span></div>
       <div class="line"><span class="label">Departure:</span><span class="value">${new Date(leave.fromDate).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span></div>
       <div class="line"><span class="label">Return By:</span><span class="value">${new Date(leave.toDate).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span></div>

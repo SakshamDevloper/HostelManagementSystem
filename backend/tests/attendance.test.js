@@ -11,7 +11,7 @@ app.use('/api/students', require('../routes/students'));
 app.use('/api/attendance', require('../routes/attendance'));
 app.use(require('../middleware/errorHandler'));
 
-const { connectDB, disconnectDB, clearDB, createTestAdmin } = require('./setup');
+const { connectDB, disconnectDB, clearDB, createTestWarden } = require('./setup');
 
 describe('Attendance Routes', () => {
   let cookie, studentId;
@@ -21,10 +21,10 @@ describe('Attendance Routes', () => {
   afterEach(async () => await clearDB());
 
   beforeEach(async () => {
-    await createTestAdmin();
+    await createTestWarden();
     const loginRes = await request(app)
       .post('/api/auth/login')
-      .send({ email: 'admin@test.com', password: 'password123' });
+      .send({ email: 'warden@test.com', password: 'password123' });
     cookie = loginRes.headers['set-cookie'];
 
     const studentRes = await request(app)
