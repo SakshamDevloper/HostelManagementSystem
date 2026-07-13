@@ -4,11 +4,13 @@ import toast from 'react-hot-toast'
 import Modal from '../components/common/Modal'
 import EmptyState from '../components/common/EmptyState'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import { useAuth } from '../context/AuthContext'
 import { getTransfers, createTransfer, updateTransferStatus } from '../services/transferService'
 import { getRooms } from '../services/roomService'
 import { getStudents } from '../services/studentService'
 
 export default function RoomTransfersPage() {
+  const { user } = useAuth()
   const [transfers, setTransfers] = useState([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -79,9 +81,11 @@ export default function RoomTransfersPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-2xl font-bold">Room Transfers</h1>
-        <button onClick={openCreateModal} className="btn btn-primary btn-sm">
-          <Plus size={16} /> New Transfer
-        </button>
+        {(user?.role === 'admin' || user?.role === 'student') && (
+          <button onClick={openCreateModal} className="btn btn-primary btn-sm">
+            <Plus size={16} /> New Transfer
+          </button>
+        )}
       </div>
 
       <div className="flex items-center gap-3 flex-wrap">
@@ -97,7 +101,7 @@ export default function RoomTransfersPage() {
         <EmptyState
           title="No transfers found"
           description="Room transfers let students move between rooms"
-          action={<button onClick={openCreateModal} className="btn btn-primary btn-sm"><Plus size={16} /> New Transfer</button>}
+          action={(user?.role === 'admin' || user?.role === 'student') ? <button onClick={openCreateModal} className="btn btn-primary btn-sm"><Plus size={16} /> New Transfer</button> : undefined}
         />
       ) : (
         <div className="overflow-x-auto">
@@ -142,7 +146,7 @@ export default function RoomTransfersPage() {
                   </td>
                   <td className="text-xs text-base-content/60">{new Date(t.createdAt).toLocaleDateString()}</td>
                   <td>
-                    {t.status === 'pending' && (
+                    {t.status === 'pending' && user?.role === 'admin' && (
                       <div className="flex gap-1">
                         <button onClick={() => handleStatusUpdate(t._id, 'approved')} className="btn btn-ghost btn-xs btn-square text-success" title="Approve">
                           <CheckCircle size={14} />

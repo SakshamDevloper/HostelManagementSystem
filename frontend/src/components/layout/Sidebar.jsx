@@ -11,7 +11,7 @@ const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['admin', 'staff', 'student', 'parent'] },
   { to: '/students', icon: Users, label: 'Students', roles: ['admin', 'staff'] },
   { to: '/rooms', icon: DoorOpen, label: 'Rooms', roles: ['admin', 'staff'] },
-  { to: '/transfers', icon: ArrowLeftRight, label: 'Transfers', roles: ['admin', 'staff', 'student'] },
+  { to: '/transfers', icon: ArrowLeftRight, label: 'Transfers', roles: ['admin', 'student'] },
   { to: '/payments', icon: CreditCard, label: 'Payments', roles: ['admin', 'staff', 'student'] },
   { to: '/attendance', icon: ClipboardCheck, label: 'Attendance', roles: ['admin', 'staff', 'student'] },
   { to: '/complaints', icon: AlertTriangle, label: 'Complaints', roles: ['admin', 'staff', 'student'] },

@@ -5,6 +5,6 @@ const ctrl = require('../controllers/leaveController');
 router.use(protect);
 router.get('/', ctrl.getLeaves);
 router.post('/', ctrl.createLeave);
-router.put('/:id/status', authorize('admin', 'staff'), ctrl.updateLeaveStatus);
+router.put('/:id/status', authorize('staff'), ctrl.updateLeaveStatus);
 
 module.exports = router;

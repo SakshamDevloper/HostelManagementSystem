@@ -27,11 +27,15 @@ exports.getTransfers = async (req, res, next) => {
 
 exports.createTransfer = async (req, res, next) => {
   try {
-    const student = await Student.findOne({ user: req.user._id });
-    if (!student) return res.status(400).json({ success: false, message: 'Student not found' });
+    let studentId = req.body.student;
+    if (req.user.role === 'student') {
+      const student = await Student.findOne({ user: req.user._id });
+      if (!student) return res.status(400).json({ success: false, message: 'Student not found' });
+      studentId = student._id;
+    }
     const transfer = await RoomTransfer.create({
       ...req.body,
-      student: student._id,
+      student: studentId,
       requestedBy: req.user._id,
     });
     res.status(201).json({ success: true, data: transfer });

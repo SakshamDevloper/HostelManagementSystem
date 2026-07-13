@@ -17,7 +17,7 @@ export default function LeavesPage() {
   const [showModal, setShowModal] = useState(false)
   const [filterStatus, setFilterStatus] = useState('')
   const [form, setForm] = useState({ fromDate: '', toDate: '', reason: '', destination: '', guardianContact: '' })
-  const canManage = user?.role === 'admin' || user?.role === 'staff'
+  const canManage = user?.role === 'staff'
   const fetchingRef = useRef(false)
   const submittingRef = useRef(false)
 
@@ -59,6 +59,7 @@ export default function LeavesPage() {
   }
 
   const handlePrint = (leave) => {
+    const origin = window.location.origin
     const printWindow = window.open('', '_blank')
     printWindow.document.write(`
       <html><head><title>Leave Application</title>
@@ -70,15 +71,16 @@ export default function LeavesPage() {
         .label { width: 160px; font-weight: bold; }
         .value { flex: 1; border-bottom: 1px solid #999; padding: 0 8px; }
         .status { text-align: center; margin: 30px 0; padding: 12px; border: 2px solid #000; font-size: 16px; font-weight: bold; }
-        .signatures { display: flex; justify-content: space-between; margin-top: 50px; }
+        .signatures { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 50px; }
         .sig { text-align: center; width: 200px; }
         .sig-line { border-top: 1px solid #000; padding-top: 4px; margin-top: 50px; font-size: 12px; }
+        .sig-img { width: 120px; height: 40px; object-fit: contain; margin-bottom: 4px; }
         hr { border: none; border-top: 2px dashed #999; margin: 30px 0; }
         .footer { text-align: center; font-size: 11px; color: #888; margin-top: 40px; }
         @media print { body { padding: 20px; } }
       </style></head><body>
-      <h1>🏢 HOSTEL LEAVE APPLICATION</h1>
-      <p class="subtitle">${document.title} — Leave / Outpass Form</p>
+      <h1>HOSTEL LEAVE APPLICATION</h1>
+      <p class="subtitle">Leave / Outpass Form</p>
       <hr/>
       <div class="line"><span class="label">Student Name:</span><span class="value">${leave.student?.user?.name || 'N/A'}</span></div>
       <div class="line"><span class="label">Student ID:</span><span class="value">${leave.student?.studentId || 'N/A'}</span></div>
@@ -94,10 +96,51 @@ export default function LeavesPage() {
       </div>
       ${leave.remarks ? `<div class="line"><span class="label">Admin Remarks:</span><span class="value">${leave.remarks}</span></div>` : ''}
       <div class="signatures">
+        <div class="sig"><img src="${origin}/SIGN_MINE_2.jpeg" alt="Signature" class="sig-img" /><div class="sig-line">Warden / Staff Signature</div></div>
         <div class="sig"><div class="sig-line">Student Signature</div></div>
-        <div class="sig"><div class="sig-line">Warden / Staff Signature</div></div>
       </div>
       <div class="footer">This is a computer-generated document. ${new Date().toLocaleDateString()}</div>
+      <script>window.print()</script>
+    </body></html>`)
+    printWindow.document.close()
+  }
+
+  const handlePrintGatepass = (leave) => {
+    const origin = window.location.origin
+    const printWindow = window.open('', '_blank')
+    printWindow.document.write(`
+      <html><head><title>Gate Pass</title>
+      <style>
+        body { font-family: 'Courier New', monospace; padding: 40px; max-width: 500px; margin: auto; border: 3px double #000; }
+        h1 { text-align: center; font-size: 22px; margin-bottom: 2px; }
+        .subtitle { text-align: center; font-size: 11px; color: #666; margin-bottom: 20px; }
+        .line { display: flex; padding: 5px 0; font-size: 14px; }
+        .label { width: 130px; font-weight: bold; }
+        .value { flex: 1; border-bottom: 1px solid #999; padding: 0 6px; }
+        .auth { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #999; }
+        .auth img { width: 100px; height: 35px; object-fit: contain; display: block; margin: 4px auto; }
+        hr { border: none; border-top: 1px dashed #999; margin: 20px 0; }
+        .footer { text-align: center; font-size: 10px; color: #888; margin-top: 25px; }
+        .validity { text-align: center; font-size: 12px; margin: 15px 0; padding: 8px; border: 1px solid #999; background: #f5f5f5; }
+        @media print { body { padding: 20px; border: 3px double #000; } }
+      </style></head><body>
+      <h1>GATE PASS</h1>
+      <p class="subtitle">Hostel Entry / Exit Permit</p>
+      <hr/>
+      <div class="line"><span class="label">Student Name:</span><span class="value">${leave.student?.user?.name || 'N/A'}</span></div>
+      <div class="line"><span class="label">Student ID:</span><span class="value">${leave.student?.studentId || 'N/A'}</span></div>
+      <div class="line"><span class="label">Destination:</span><span class="value">${leave.destination || 'N/A'}</span></div>
+      <div class="line"><span class="label">Departure:</span><span class="value">${new Date(leave.fromDate).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span></div>
+      <div class="line"><span class="label">Return By:</span><span class="value">${new Date(leave.toDate).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span></div>
+      <div class="line"><span class="label">Reason:</span><span class="value">${leave.reason}</span></div>
+      <div class="line"><span class="label">Guardian:</span><span class="value">${leave.guardianContact || 'N/A'}</span></div>
+      <div class="validity"><strong>Valid for exit & entry during above period</strong></div>
+      <div class="auth">
+        <strong>Authorized By</strong>
+        <img src="${origin}/SIGN_MINE_2.jpeg" alt="Signature" />
+        <div>Warden / Staff</div>
+      </div>
+      <div class="footer">Show this pass at the gate. ${new Date().toLocaleDateString()}</div>
       <script>window.print()</script>
     </body></html>`)
     printWindow.document.close()
@@ -146,7 +189,10 @@ export default function LeavesPage() {
                   </div>
                 )}
             {l.status !== 'pending' && (
-              <button onClick={() => handlePrint(l)} className="btn btn-ghost btn-xs mt-1 text-primary"><Printer size={12} /> Print</button>
+              <div className="flex gap-1 mt-1">
+                <button onClick={() => handlePrint(l)} className="btn btn-ghost btn-xs text-primary"><Printer size={12} /> Print</button>
+                {l.status === 'approved' && <button onClick={() => handlePrintGatepass(l)} className="btn btn-ghost btn-xs text-secondary"><Printer size={12} /> Gatepass</button>}
+              </div>
             )}
                 {l.remarks && <p className="text-xs text-base-content/60 mt-2">Remarks: {l.remarks}</p>}
               </div>
