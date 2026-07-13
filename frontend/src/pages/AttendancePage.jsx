@@ -21,7 +21,7 @@ export default function AttendancePage() {
   const [view, setView] = useState('daily')
   const [markMode, setMarkMode] = useState(false)
 
-  const isAdminOrStaff = user?.role === 'admin' || user?.role === 'staff'
+  const isWarden = user?.role === 'warden'
   const fetchingRef = useRef(false)
 
   const fetchData = async () => {
@@ -73,7 +73,7 @@ export default function AttendancePage() {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-2xl font-bold">Attendance</h1>
         <div className="flex gap-2">
-          {isAdminOrStaff && (
+          {isWarden && (
             <button onClick={() => setMarkMode(!markMode)} className={`btn btn-sm ${markMode ? 'btn-primary' : 'btn-ghost'}`}>
               {markMode ? 'Done Marking' : 'Mark Attendance'}
             </button>
