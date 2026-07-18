@@ -4,6 +4,8 @@ import Layout from './components/layout/Layout'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import AttendancePage from './pages/AttendancePage'
+import MessMenuPage from './pages/MessMenuPage'
+import MessMenuAdminPage from './pages/MessMenuAdminPage'
 import StudentsPage from './pages/StudentsPage'
 import StudentDetailPage from './pages/StudentDetailPage'
 import RoomsPage from './pages/RoomsPage'
@@ -44,6 +46,8 @@ function App() {
         <Route path="transfers" element={<RoomTransfersPage />} />
         <Route path="payments" element={<PaymentsPage />} />
         <Route path="attendance" element={<AttendancePage />} />
+        <Route path="mess-menu" element={<MessMenuPage />} />
+        <Route path="mess-menu/manage" element={<MessMenuAdminPage />} />
         <Route path="complaints" element={<ComplaintsPage />} />
         <Route path="leaves" element={<LeavesPage />} />
         <Route path="visitors" element={<VisitorsPage />} />

@@ -61,6 +61,7 @@ app.use('/api/visitors', require('./routes/visitors'));
 app.use('/api/transfers', require('./routes/transfers'));
 app.use('/api/exports', require('./routes/exports'));
 app.use('/api/uploads', require('./routes/uploads'));
+app.use('/api/mess-menu', require('./routes/messMenu'));
 app.use('/api/audit', require('./routes/audit'));
 
 app.use('/api', (req, res) => {

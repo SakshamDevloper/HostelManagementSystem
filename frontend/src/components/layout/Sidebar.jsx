@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Users, DoorOpen, CreditCard, AlertTriangle,
   LogOut, CalendarClock, UserCheck, ClipboardList, Bell,
-  UsersRound, FileText, Settings, Activity, Menu, X, Hotel, ClipboardCheck, ArrowLeftRight
+  UsersRound, FileText, Settings, Activity, Menu, X, Hotel, ClipboardCheck, ArrowLeftRight, UtensilsCrossed
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useState } from 'react'
@@ -13,6 +13,8 @@ const navItems = [
   { to: '/rooms', icon: DoorOpen, label: 'Rooms', roles: ['admin', 'staff', 'warden'] },
   { to: '/transfers', icon: ArrowLeftRight, label: 'Transfers', roles: ['admin', 'student', 'warden'] },
   { to: '/payments', icon: CreditCard, label: 'Payments', roles: ['admin', 'staff', 'student', 'warden'] },
+  { to: '/mess-menu', icon: UtensilsCrossed, label: 'Mess Menu', roles: ['admin', 'staff', 'student', 'warden'] },
+  { to: '/mess-menu/manage', icon: UtensilsCrossed, label: 'Menu Editor', roles: ['admin', 'warden'] },
   { to: '/attendance', icon: ClipboardCheck, label: 'Attendance', roles: ['student', 'warden'] },
   { to: '/complaints', icon: AlertTriangle, label: 'Complaints', roles: ['admin', 'staff', 'student', 'warden'] },
   { to: '/leaves', icon: CalendarClock, label: 'Leaves', roles: ['student', 'warden'] },
