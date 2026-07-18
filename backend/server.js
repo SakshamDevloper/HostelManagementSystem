@@ -83,9 +83,9 @@ const createEssentialUsers = async () => {
   try {
     const User = require('./models/User');
 
-    const existingUsers = await User.countDocuments();
-    if (existingUsers > 0) {
-      console.log('Users already exist — skipping user creation to preserve existing records.');
+    const existingAdmin = await User.findOne({ email: 'admin@hostel.com' });
+    if (existingAdmin) {
+      console.log('Demo admin found — skipping user creation.');
       return;
     }
 
