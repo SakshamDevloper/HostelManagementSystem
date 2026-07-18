@@ -78,9 +78,11 @@ const buildEntries = () => {
     for (const [meal, dates] of Object.entries(meals)) {
       for (const [dateStr, items] of Object.entries(dates)) {
         const itemList = typeof items === 'string' ? [items] : items;
+        const d = new Date(dateStr);
         entries.push({
           mess,
-          date: new Date(dateStr),
+          date: d,
+          day: d.toLocaleDateString('en-US', { weekday: 'long' }),
           meal: meal.charAt(0).toUpperCase() + meal.slice(1),
           items: itemList,
           notes: meal === 'lunch' ? notesMap[mess] : '',
