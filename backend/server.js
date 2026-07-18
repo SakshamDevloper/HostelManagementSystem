@@ -109,9 +109,24 @@ const createEssentialUsers = async () => {
   }
 };
 
+const seedMessMenu = async () => {
+  try {
+    const MessMenu = require('./models/MessMenu');
+    const count = await MessMenu.countDocuments();
+    if (count > 0) { console.log('Mess menu data exists — skipping seed.'); return; }
+    const { buildEntries } = require('./seed-mess-menu');
+    await MessMenu.insertMany(buildEntries());
+    const c = await MessMenu.countDocuments();
+    console.log(`✅ Mess menu seeded: ${c} entries`);
+  } catch (err) {
+    console.error('Mess menu seed error:', err.message);
+  }
+};
+
 connectDB().then(async () => {
   console.log('  ✅ Database connected');
   await createEssentialUsers();
+  await seedMessMenu();
   server.listen(PORT, () => {
     console.log(`\n🚀 Server listening on port ${PORT}`);
   });

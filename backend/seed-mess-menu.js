@@ -119,4 +119,8 @@ const seed = async () => {
   }
 };
 
-seed();
+module.exports = { buildEntries };
+
+if (require.main === module) {
+  seed();
+}
