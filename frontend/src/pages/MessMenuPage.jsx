@@ -44,7 +44,7 @@ export default function MessMenuPage() {
   const { socket } = useSocket()
   const [activeMess, setActiveMess] = useState('South')
   const [showBoth, setShowBoth] = useState(false)
-  const [view, setView] = useState('today')
+  const [view, setView] = useState('week')
   const [todayMenu, setTodayMenu] = useState({ South: {}, North: {} })
   const [weekMenu, setWeekMenu] = useState({ South: {}, North: {} })
   const [weekStart, setWeekStart] = useState(todayString())
