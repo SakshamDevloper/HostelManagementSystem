@@ -6,6 +6,6 @@ router.use(protect);
 router.get('/', ctrl.getLeaves);
 router.post('/', ctrl.createLeave);
 router.delete('/:id', ctrl.deleteLeave);
-router.put('/:id/status', authorize('warden'), ctrl.updateLeaveStatus);
+router.put('/:id/status', authorize('admin', 'staff', 'warden'), ctrl.updateLeaveStatus);
 
 module.exports = router;

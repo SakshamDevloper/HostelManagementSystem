@@ -17,7 +17,7 @@ const navItems = [
   { to: '/mess-menu/manage', icon: UtensilsCrossed, label: 'Menu Editor', roles: ['admin', 'warden'] },
   { to: '/attendance', icon: ClipboardCheck, label: 'Attendance', roles: ['student', 'warden'] },
   { to: '/complaints', icon: AlertTriangle, label: 'Complaints', roles: ['admin', 'staff', 'student', 'warden'] },
-  { to: '/leaves', icon: CalendarClock, label: 'Leaves', roles: ['student', 'warden'] },
+  { to: '/leaves', icon: CalendarClock, label: 'Leaves', roles: ['admin', 'staff', 'student', 'warden'] },
   { to: '/visitors', icon: UserCheck, label: 'Visitors', roles: ['admin', 'staff', 'warden', 'security'] },
   { to: '/notices', icon: ClipboardList, label: 'Notices', roles: ['admin', 'staff', 'student', 'parent', 'warden'] },
   { to: '/notifications', icon: Bell, label: 'Notifications', roles: ['admin', 'staff', 'student', 'parent', 'warden'] },

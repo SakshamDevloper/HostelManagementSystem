@@ -17,7 +17,7 @@ export default function LeavesPage() {
   const [showModal, setShowModal] = useState(false)
   const [filterStatus, setFilterStatus] = useState('')
   const [form, setForm] = useState({ fromDate: '', toDate: '', reason: '', destination: '', guardianContact: '' })
-  const canManage = user?.role === 'warden'
+  const canManage = ['admin', 'staff', 'warden'].includes(user?.role)
   const fetchingRef = useRef(false)
   const submittingRef = useRef(false)
 
