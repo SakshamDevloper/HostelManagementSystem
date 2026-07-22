@@ -12,7 +12,11 @@ const mealBadge = { Breakfast: 'badge-warning', Lunch: 'badge-success', Dinner: 
 
 function todayString() {
   const d = new Date()
-  return d.toISOString().split('T')[0]
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')
+}
+
+function toLocalDateString(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')
 }
 
 function formatDate(dateStr) {
@@ -25,7 +29,7 @@ function getWeekDates(startDate) {
   for (let i = 0; i < 7; i++) {
     const d = new Date(start)
     d.setDate(d.getDate() + i)
-    dates.push(d.toISOString().split('T')[0])
+    dates.push(toLocalDateString(d))
   }
   return dates
 }
@@ -195,7 +199,7 @@ export default function MessMenuPage() {
                   onClick={() => {
                     const d = new Date(weekStart + 'T00:00:00')
                     d.setDate(d.getDate() - 7)
-                    setWeekStart(d.toISOString().split('T')[0])
+                    setWeekStart(toLocalDateString(d))
                   }}
                   className="btn btn-ghost btn-xs"
                 >
@@ -206,7 +210,7 @@ export default function MessMenuPage() {
                   onClick={() => {
                     const d = new Date(weekStart + 'T00:00:00')
                     d.setDate(d.getDate() + 7)
-                    setWeekStart(d.toISOString().split('T')[0])
+                    setWeekStart(toLocalDateString(d))
                   }}
                   className="btn btn-ghost btn-xs"
                 >

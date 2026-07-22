@@ -74,8 +74,12 @@ exports.bulkCreateMenu = async (req, res, next) => {
 
 exports.updateMenu = async (req, res, next) => {
   try {
-    const { items, notes } = req.body;
-    const menu = await MessMenu.findByIdAndUpdate(req.params.id, { items, notes }, { returnDocument: 'after' });
+    const { mess, date, meal, items, notes } = req.body;
+    const update = { items, notes };
+    if (mess) update.mess = mess;
+    if (date) { update.date = new Date(date); update.day = new Date(date).toLocaleDateString('en-US', { weekday: 'long' }); }
+    if (meal) update.meal = meal;
+    const menu = await MessMenu.findByIdAndUpdate(req.params.id, update, { returnDocument: 'after' });
     if (!menu) return res.status(404).json({ success: false, message: 'Menu entry not found' });
     await logActivity({ user: req.user._id, action: 'update', resource: 'messMenu', resourceId: menu._id, details: { mess: menu.mess, date: menu.date, meal: menu.meal }, ip: req.ip });
     const io = getIO();
