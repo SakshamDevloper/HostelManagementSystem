@@ -21,7 +21,7 @@ export default function PaymentsPage() {
   const [filterYear, setFilterYear] = useState(new Date().getFullYear().toString())
   const [filterStatus, setFilterStatus] = useState('')
   const [form, setForm] = useState({ student: '', amount: '', month: new Date().getMonth() + 1, year: new Date().getFullYear(), type: 'rent', paymentMethod: 'cash', notes: '' })
-  const canRecord = user?.role === 'admin' || user?.role === 'staff'
+  const canRecord = ['admin', 'staff', 'warden'].includes(user?.role)
 
   const fetchPayments = async () => {
     try {

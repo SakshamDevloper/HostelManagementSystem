@@ -6,9 +6,11 @@ import Modal from '../components/common/Modal'
 import ConfirmDialog from '../components/common/ConfirmDialog'
 import EmptyState from '../components/common/EmptyState'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import { useAuth } from '../context/AuthContext'
 import { getStudents, createStudent, updateStudent, deleteStudent, checkoutStudent, bulkImport } from '../services/studentService'
 
 export default function StudentsPage() {
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(true)
@@ -16,6 +18,7 @@ export default function StudentsPage() {
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [showBulk, setShowBulk] = useState(false)
+  const isAdmin = user?.role === 'admin'
   const [editing, setEditing] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [form, setForm] = useState({ name: '', email: '', password: 'password123', phone: '', studentId: '', gender: 'male' })
@@ -89,12 +92,16 @@ export default function StudentsPage() {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-2xl font-bold">Students</h1>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowBulk(true)} className="btn btn-ghost btn-sm">
-            <Upload size={16} /> Bulk Import
-          </button>
-          <button onClick={() => { setEditing(null); setForm({ name: '', email: '', password: 'password123', phone: '', studentId: '', gender: 'male' }); setShowModal(true) }} className="btn btn-primary btn-sm">
-            <Plus size={16} /> Add Student
-          </button>
+          {isAdmin && (
+            <button onClick={() => setShowBulk(true)} className="btn btn-ghost btn-sm">
+              <Upload size={16} /> Bulk Import
+            </button>
+          )}
+          {isAdmin && (
+            <button onClick={() => { setEditing(null); setForm({ name: '', email: '', password: 'password123', phone: '', studentId: '', gender: 'male' }); setShowModal(true) }} className="btn btn-primary btn-sm">
+              <Plus size={16} /> Add Student
+            </button>
+          )}
         </div>
       </div>
 
@@ -109,7 +116,7 @@ export default function StudentsPage() {
         <EmptyState
           title="No students found"
           description={search ? 'Try a different search term' : 'Add your first student to get started'}
-          action={<button onClick={() => { setEditing(null); setForm({ name: '', email: '', password: 'password123', phone: '', studentId: '', gender: 'male' }); setShowModal(true) }} className="btn btn-primary btn-sm"><Plus size={16} /> Add Student</button>}
+          action={isAdmin ? <button onClick={() => { setEditing(null); setForm({ name: '', email: '', password: 'password123', phone: '', studentId: '', gender: 'male' }); setShowModal(true) }} className="btn btn-primary btn-sm"><Plus size={16} /> Add Student</button> : undefined}
         />
       ) : (
         <div className="overflow-x-auto">

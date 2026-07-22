@@ -18,7 +18,7 @@ export default function NoticesPage() {
   const [showModal, setShowModal] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ title: '', content: '', priority: 'normal', targetAudience: 'all' })
-  const isAdmin = user?.role === 'admin' || user?.role === 'staff'
+  const isAdmin = ['admin', 'staff', 'warden'].includes(user?.role)
   const submittingRef = useRef(false)
 
   const fetchNotices = async () => {

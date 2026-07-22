@@ -21,7 +21,7 @@ export default function ComplaintsPage() {
   const [filterStatus, setFilterStatus] = useState('')
   const [form, setForm] = useState({ category: 'plumbing', description: '' })
   const [feedbackForm, setFeedbackForm] = useState({ id: null, feedback: '', feedbackRating: 5 })
-  const canManage = user?.role === 'admin' || user?.role === 'staff'
+  const canManage = ['admin', 'staff', 'warden'].includes(user?.role)
   const fetchingRef = useRef(false)
   const submittingRef = useRef(false)
 

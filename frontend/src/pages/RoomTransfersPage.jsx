@@ -146,7 +146,7 @@ export default function RoomTransfersPage() {
                   </td>
                   <td className="text-xs text-base-content/60">{new Date(t.createdAt).toLocaleDateString()}</td>
                   <td>
-                    {t.status === 'pending' && user?.role === 'admin' && (
+                    {t.status === 'pending' && ['admin', 'warden'].includes(user?.role) && (
                       <div className="flex gap-1">
                         <button onClick={() => handleStatusUpdate(t._id, 'approved')} className="btn btn-ghost btn-xs btn-square text-success" title="Approve">
                           <CheckCircle size={14} />
