@@ -7,7 +7,7 @@ import EmptyState from '../components/common/EmptyState'
 import { getMenu, getWeekMenu } from '../services/messMenuService'
 
 const mealIcons = { Breakfast: Sunrise, Lunch: Sun, Dinner: Moon }
-const mealColors = { Breakfast: 'bg-amber-50 border-amber-200', Lunch: 'bg-orange-50 border-orange-200', Dinner: 'bg-indigo-50 border-indigo-200' }
+const mealColors = { Breakfast: 'bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800', Lunch: 'bg-orange-50 dark:bg-orange-950 border-orange-200 dark:border-orange-800', Dinner: 'bg-indigo-50 dark:bg-indigo-950 border-indigo-200 dark:border-indigo-800' }
 const mealBadge = { Breakfast: 'badge-warning', Lunch: 'badge-success', Dinner: 'badge-info' }
 
 function todayString() {
