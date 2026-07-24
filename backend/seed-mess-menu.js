@@ -14,6 +14,14 @@ const seedData = {
       '2026-07-21': 'Aloo Matar Sandwich & Sauce',
       '2026-07-22': 'Dal Vada Chutney',
       '2026-07-23': 'Idly & Chutney',
+      '2026-07-24': 'Lemon Rice',
+      '2026-07-25': 'Masala Parotha & Onion Chutney',
+      '2026-07-26': 'Bread Butter',
+      '2026-07-27': 'Corn Peanut Chat',
+      '2026-07-28': 'Pasta',
+      '2026-07-29': 'Uggani & Pappula Podi',
+      '2026-07-30': 'Semiya Upma & Chutney',
+      '2026-07-31': 'White Dokla and Peanut Chutney',
     },
     lunch: {
       '2026-07-16': ['Drumstick Tomato', 'Rasa Moong / Rasam', 'Roti', 'Rice', 'Dal', 'Pickle', 'Butter Milk', 'Sambharo'],
@@ -24,6 +32,7 @@ const seedData = {
       '2026-07-21': ['Turiya Matar', 'Rasam', 'Roti', 'Rice', 'Dal', 'Karampodi', 'Butter Milk', 'Onion Salad'],
       '2026-07-22': ['Dahi Onion', 'Chana Dal / Miriyala Rasam', 'Roti', 'Rice', 'Dal', 'Pickle', 'Butter Milk', 'Salad'],
       '2026-07-23': ['Aloo Tindora', 'Tomato Rasam', 'Roti', 'Rice', 'Dal', 'Karampodi', 'Butter Milk', 'Onion Salad'],
+      '2026-07-24': ['Corn Capsicum', 'Desi Chana / Rasam', 'Roti', 'Rice', 'Dal', 'Pickle', 'Butter Milk', 'Salad'],
     },
     dinner: {
       '2026-07-16': ['Aloo Kurma', 'Roti', 'Briyani / Masala Rice', 'Chaas Bhondi Raita'],
