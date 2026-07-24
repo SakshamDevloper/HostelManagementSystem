@@ -112,12 +112,18 @@ const createEssentialUsers = async () => {
 const seedMessMenu = async () => {
   try {
     const MessMenu = require('./models/MessMenu');
-    const count = await MessMenu.countDocuments();
-    if (count > 0) { console.log('Mess menu data exists — skipping seed.'); return; }
     const { buildEntries } = require('./seed-mess-menu');
-    await MessMenu.insertMany(buildEntries());
+    const entries = buildEntries();
+    const ops = entries.map(e => ({
+      updateOne: {
+        filter: { mess: e.mess, date: e.date, meal: e.meal },
+        update: { $set: e },
+        upsert: true,
+      },
+    }));
+    const result = await MessMenu.bulkWrite(ops);
     const c = await MessMenu.countDocuments();
-    console.log(`✅ Mess menu seeded: ${c} entries`);
+    console.log(`✅ Mess menu seeded: ${c} entries (matched: ${result.matchedCount}, upserted: ${result.upsertedCount}, modified: ${result.modifiedCount})`);
   } catch (err) {
     console.error('Mess menu seed error:', err.message);
   }
