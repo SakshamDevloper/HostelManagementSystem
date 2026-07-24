@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Sun, Sunrise, Moon, UtensilsCrossed, CalendarDays } from 'lucide-react'
 import { useSocket } from '../context/SocketContext'
 import toast from 'react-hot-toast'
@@ -52,54 +52,47 @@ export default function MessMenuPage() {
   const [todayMenu, setTodayMenu] = useState({ South: {}, North: {} })
   const [weekMenu, setWeekMenu] = useState({ South: {}, North: {} })
   const [weekStart, setWeekStart] = useState(todayString())
+  const [refreshKey, setRefreshKey] = useState(0)
   const [loading, setLoading] = useState(true)
-  const fetchingRef = useRef(false)
-
-  const fetchToday = async () => {
-    if (fetchingRef.current) return
-    fetchingRef.current = true
-    try {
-      const today = todayString()
-      const messes = showBoth ? ['North', 'South'] : [activeMess]
-      const results = await Promise.all(
-        messes.map(m => getMenu({ mess: m, date: today }).then(r => ({ mess: m, data: r.data.data })))
-      )
-      const obj = {}
-      results.forEach(r => { obj[r.mess] = groupByDate(r.data)[today] || {} })
-      setTodayMenu(prev => ({ ...prev, ...obj }))
-    } catch { toast.error('Failed to load today\'s menu') }
-    finally { fetchingRef.current = false; setLoading(false) }
-  }
-
-  const fetchWeek = async () => {
-    if (fetchingRef.current) return
-    fetchingRef.current = true
-    try {
-      const messes = showBoth ? ['North', 'South'] : [activeMess]
-      const results = await Promise.all(
-        messes.map(m => getWeekMenu({ mess: m, startDate: weekStart }).then(r => ({ mess: m, data: r.data.data })))
-      )
-      const obj = {}
-      results.forEach(r => { obj[r.mess] = groupByDate(r.data) })
-      setWeekMenu(prev => ({ ...prev, ...obj }))
-    } catch { toast.error('Failed to load week menu') }
-    finally { fetchingRef.current = false; setLoading(false) }
-  }
 
   useEffect(() => {
-    if (view === 'today') fetchToday()
-    else fetchWeek()
-  }, [view, activeMess, showBoth, weekStart])
+    let cancelled = false
+    const fetchData = async () => {
+      setLoading(true)
+      try {
+        if (view === 'today') {
+          const today = todayString()
+          const messes = showBoth ? ['North', 'South'] : [activeMess]
+          const results = await Promise.all(
+            messes.map(m => getMenu({ mess: m, date: today }).then(r => ({ mess: m, data: r.data.data })))
+          )
+          if (cancelled) return
+          const obj = {}
+          results.forEach(r => { obj[r.mess] = groupByDate(r.data)[today] || {} })
+          setTodayMenu(prev => ({ ...prev, ...obj }))
+        } else {
+          const messes = showBoth ? ['North', 'South'] : [activeMess]
+          const results = await Promise.all(
+            messes.map(m => getWeekMenu({ mess: m, startDate: weekStart }).then(r => ({ mess: m, data: r.data.data })))
+          )
+          if (cancelled) return
+          const obj = {}
+          results.forEach(r => { obj[r.mess] = groupByDate(r.data) })
+          setWeekMenu(prev => ({ ...prev, ...obj }))
+        }
+      } catch { toast.error('Failed to load menu') }
+      finally { if (!cancelled) setLoading(false) }
+    }
+    fetchData()
+    return () => { cancelled = true }
+  }, [view, activeMess, showBoth, weekStart, refreshKey])
 
   useEffect(() => {
     if (!socket) return
-    const refresh = () => {
-      if (view === 'today') fetchToday()
-      else fetchWeek()
-    }
-    socket.on('mess-menu-updated', refresh)
-    return () => { socket.off('mess-menu-updated', refresh) }
-  }, [socket, view])
+    const handler = () => setRefreshKey(k => k + 1)
+    socket.on('mess-menu-updated', handler)
+    return () => { socket.off('mess-menu-updated', handler) }
+  }, [socket])
 
   const messList = showBoth ? ['North', 'South'] : [activeMess]
   const currentMenu = view === 'today' ? todayMenu : weekMenu
